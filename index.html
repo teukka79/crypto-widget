@@ -3,14 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Crypto Price Widget - Trending Masterpiece</title>
+    <title>Crypto Price Widget - Mobile Fixed</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        /* KORJAUS: Varmistetaan että tausta on aina tumma eikä valkoista näy */
+        html, body {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background: #0f0f1e; /* Kiinteä varaväri */
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            background-attachment: fixed; /* Tausta pysyy paikallaan rullatessa */
             display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+            color: #e6edf3;
         }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         .widget {
             background: rgba(22, 27, 34, 0.95);
             border-radius: 24px; padding: 40px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -19,10 +27,10 @@
         }
         
         .header { display: flex; align-items: center; gap: 15px; margin-bottom: 30px; }
-        .crypto-icon { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: none; border: none; }
+        .crypto-icon { width: 52px; height: 52px; display: flex; align-items: center; justify-content: center; background: none; }
         .crypto-icon img { width: 100%; height: 100%; object-fit: contain; }
         
-        .title { color: #e6edf3; font-size: 24px; font-weight: 600; }
+        .title { font-size: 24px; font-weight: 600; }
         .subtitle { color: #8b949e; font-size: 14px; }
 
         .crypto-selector { margin-bottom: 30px; }
@@ -40,7 +48,7 @@
         .tab-btn.active { background: #238636; color: white; border-color: transparent; }
 
         .price-display { text-align: center; margin: 30px 0; }
-        .price { font-size: clamp(32px, 12vw, 56px); font-weight: 700; color: #e6edf3; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+        .price { font-size: clamp(32px, 12vw, 56px); font-weight: 700; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
         .price-change { font-size: 18px; font-weight: 500; padding: 6px 16px; border-radius: 12px; display: inline-block; }
         .price-change.positive { color: #3fb950; background: rgba(63, 185, 80, 0.1); }
         .price-change.negative { color: #f85149; background: rgba(248, 81, 73, 0.1); }
@@ -49,17 +57,17 @@
         .stat { background: rgba(48, 54, 61, 0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .stat-full { grid-column: span 2; }
         .stat-label { color: #8b949e; font-size: 12px; text-transform: uppercase; margin-bottom: 6px; }
-        .stat-value { color: #e6edf3; font-size: 18px; font-weight: 600; }
+        .stat-value { font-size: 18px; font-weight: 600; }
 
         .alarm-section { background: rgba(48, 54, 61, 0.5); border-radius: 16px; padding: 24px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .alarm-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
-        .alarm-header { color: #e6edf3; font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .alarm-header { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
         
-        .icon-svg { width: 24px; height: 24px; fill: currentColor; vertical-align: middle; }
+        .icon-svg { width: 24px; height: 24px; fill: currentColor; }
         
         .mute-btn {
             background: none; border: none; color: #8b949e; cursor: pointer; padding: 4px;
-            display: flex; align-items: center; justify-content: center; transition: 0.2s;
+            display: flex; align-items: center; justify-content: center;
         }
         .mute-btn.is-muted { color: #f85149; }
 
@@ -67,7 +75,7 @@
         input[type="number"] {
             width: 100%; padding: 12px; background: rgba(22, 27, 34, 0.8);
             border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e6edf3;
-            outline: none; transition: all 0.2s; font-size: 16px;
+            outline: none; font-size: 16px;
         }
 
         .alarm-buttons { display: flex; gap: 8px; }
@@ -77,12 +85,7 @@
 
         .alarm-status { margin-top: 16px; padding: 12px; border-radius: 12px; font-size: 14px; text-align: center; display: none; }
         .alarm-status.active { display: block; background: rgba(88, 166, 255, 0.1); color: #58a6ff; }
-        
-        /* TRIGGERED TRENDING STYLES */
-        .alarm-status.triggered { 
-            display: flex; align-items: center; justify-content: center; gap: 10px;
-            font-weight: 700; animation: pulse 1s infinite; 
-        }
+        .alarm-status.triggered { display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 700; animation: pulse 1s infinite; }
         .triggered-up { background: rgba(63, 185, 80, 0.2); color: #3fb950; border: 1px solid rgba(63, 185, 80, 0.3); }
         .triggered-down { background: rgba(248, 81, 73, 0.2); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
 
@@ -166,17 +169,8 @@
             dot: { name: 'Polkadot', symbol: 'DOT', pair: 'dotusdt', dec: 3, img: 'https://assets.coingecko.com/coins/images/12171/large/polkadot.png' }
         };
 
-        // Material Trending Icons (SVG)
         const TREND_UP = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 6l2.29 2.29-4.88 4.88-4-4L2 16.59 3.41 18l6-6 4 4 6.3-6.29L22 12V6h-6z"/></svg>';
         const TREND_DOWN = '<svg class="icon-svg" viewBox="0 0 24 24"><path d="M16 18l2.29-2.29-4.88-4.88-4 4L2 7.41 3.41 6l6 6 4-4 6.3 6.29L22 12v6h-6z"/></svg>';
-
-        function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
-        function updateMuteUI() {
-            const btn = document.getElementById('muteBtn');
-            const icon = document.getElementById('speakerIcon').querySelector('path');
-            btn.classList.toggle('is-muted', isMuted);
-            icon.setAttribute('d', isMuted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
-        }
 
         function connect() {
             if (ws) ws.close();
@@ -200,7 +194,6 @@
                 if (cKey === currentCrypto) updateStatsUI();
             };
             ws.onopen = () => document.getElementById('connectionText').innerText = 'Live Connection';
-            ws.onclose = () => setTimeout(connect, 3000);
         }
 
         function checkAllAlarms(key, price) {
@@ -216,8 +209,9 @@
 
         function triggerEffect(key, dir, price) {
             if (key === currentCrypto) {
-                if (!isMuted && Date.now() - lastAlarmTime > 10000) {
-                    document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{});
+                if (!isMuted && Date.now() - lastAlarmTime > 5000) {
+                    const sound = document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow');
+                    sound.play().catch(e => console.log("Audio play failed:", e));
                     lastAlarmTime = Date.now();
                 }
                 const s = document.getElementById('alarmStatus');
@@ -241,6 +235,28 @@
             document.getElementById('lastUpdate').innerText = new Date().toLocaleTimeString();
         }
 
+        function changeCrypto() {
+            currentCrypto = document.getElementById('cryptoSelect').value;
+            const c = config[currentCrypto];
+            document.getElementById('cryptoName').innerText = c.name;
+            document.getElementById('cryptoPair').innerText = c.symbol + '/USDT';
+            document.getElementById('cryptoIconImg').src = c.img;
+            document.getElementById('alarmStatus').style.display = 'none';
+            loadSettings();
+            updateStatsUI();
+        }
+
+        function setAlarm() {
+            // MOBIILI-HERÄTYS: Soitetaan äänet hiljaisena jotta selain antaa luvan myöhempään käyttöön
+            const hAudio = document.getElementById('audioHigh');
+            const lAudio = document.getElementById('audioLow');
+            hAudio.play().then(() => { hAudio.pause(); hAudio.currentTime = 0; });
+            lAudio.play().then(() => { lAudio.pause(); lAudio.currentTime = 0; });
+
+            allAlarms[currentCrypto] = { h: parseFloat(document.getElementById('alarmHigh').value) || null, l: parseFloat(document.getElementById('alarmLow').value) || null };
+            saveSettings(); updateAlarmUI();
+        }
+
         function switchView(view) {
             currentView = view;
             document.getElementById('btn1h').classList.toggle('active', view === '1h');
@@ -259,22 +275,6 @@
             document.getElementById('valVol').innerText = d.v;
         }
 
-        function changeCrypto() {
-            currentCrypto = document.getElementById('cryptoSelect').value;
-            const c = config[currentCrypto];
-            document.getElementById('cryptoName').innerText = c.name;
-            document.getElementById('cryptoPair').innerText = c.symbol + '/USDT';
-            document.getElementById('cryptoIconImg').src = c.img;
-            document.getElementById('alarmStatus').style.display = 'none';
-            loadSettings();
-            updateStatsUI();
-        }
-
-        function setAlarm() {
-            allAlarms[currentCrypto] = { h: parseFloat(document.getElementById('alarmHigh').value) || null, l: parseFloat(document.getElementById('alarmLow').value) || null };
-            saveSettings(); updateAlarmUI();
-        }
-
         function clearAlarm() {
             allAlarms[currentCrypto] = null;
             document.getElementById('alarmHigh').value = '';
@@ -282,9 +282,17 @@
             saveSettings(); updateAlarmUI();
         }
 
-        function saveSettings() { localStorage.setItem('crypto_trending_v1', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
+        function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
+        function updateMuteUI() {
+            const btn = document.getElementById('muteBtn');
+            const icon = document.getElementById('speakerIcon').querySelector('path');
+            btn.classList.toggle('is-muted', isMuted);
+            icon.setAttribute('d', isMuted ? "M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3z" : "M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z");
+        }
+
+        function saveSettings() { localStorage.setItem('crypto_mobile_final', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
         function loadSettings() {
-            const s = JSON.parse(localStorage.getItem('crypto_trending_v1') || '{}');
+            const s = JSON.parse(localStorage.getItem('crypto_mobile_final') || '{}');
             allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI();
             const d = allAlarms[currentCrypto] || {};
             document.getElementById('alarmHigh').value = d.h || '';
