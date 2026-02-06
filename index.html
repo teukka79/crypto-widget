@@ -1,11 +1,11 @@
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v41</title>
+    <title>Crypto Glass Mobile v43</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -21,12 +21,11 @@
             height: 100%; margin: 0; padding: 0; 
             background-color: #010409; 
             overflow-x: hidden;
-            overflow-y: auto; /* Varmistaa vierityksen */
+            overflow-y: auto;
         }
 
         body {
-            /* Lisätty enemmän paddingia pohjaan (80px), jotta widget ei jää palkkien alle */
-            padding: env(safe-area-inset-top) 15px 80px 15px;
+            padding: env(safe-area-inset-top) 15px 100px 15px;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex; flex-direction: column; align-items: center;
             color: #e6edf3;
@@ -42,28 +41,22 @@
         .widget {
             position: relative; width: 100%; max-width: 400px;
             margin-top: 20px; padding: 25px; border-radius: 28px; 
-            overflow: hidden; background: rgba(10, 15, 25, 0.45); 
+            background: rgba(10, 15, 25, 0.45); 
             backdrop-filter: blur(45px); -webkit-backdrop-filter: blur(45px);
             border: 1px solid rgba(255, 255, 255, 0.15);
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            overflow: visible; /* Estää leikkautumisen */
         }
 
         .widget::before {
-            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: -1;
+            content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0; 
+            z-index: -1; border-radius: 28px;
             background-image: 
                 radial-gradient(at 5% 5%, var(--forest-green) 0px, transparent 65%),
                 radial-gradient(at 95% 5%, var(--midnight-blue) 0px, transparent 65%),
                 radial-gradient(at 95% 95%, var(--forest-green) 0px, transparent 65%),
                 radial-gradient(at 5% 95%, var(--midnight-blue) 0px, transparent 65%);
         }
-
-        @keyframes pulse-trigger {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.02); opacity: 0.9; }
-            100% { transform: scale(1); opacity: 1; }
-        }
-
-        .trigger-active { animation: pulse-trigger 0.8s infinite ease-in-out; }
 
         .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
         .crypto-icon { width: 40px; height: 40px; flex-shrink: 0; }
@@ -78,22 +71,12 @@
             color: #fff; appearance: none; margin-bottom: 15px; font-size: 16px;
             transition: all 0.3s ease; outline: none;
         }
-
-        select:focus {
-            border-color: var(--accent-green);
-            box-shadow: 0 0 15px var(--focus-glow);
-        }
-
-        .tab-btn, .action {
-            height: 48px; font-size: 16px !important; font-weight: 700;
-            cursor: pointer; border: none; display: flex;
-            align-items: center; justify-content: center;
-            transition: all 0.2s ease;
-        }
+        select:focus { border-color: var(--accent-green); box-shadow: 0 0 15px var(--focus-glow); }
 
         .tab-btn {
-            flex: 1; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);
+            flex: 1; height: 48px; border-radius: 10px; border: 1px solid rgba(255, 255, 255, 0.05);
             background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.6); 
+            font-weight: 600; cursor: pointer; transition: all 0.2s;
         }
         .tab-btn.active { background: var(--accent-green); color: white; }
 
@@ -105,55 +88,35 @@
             font-size: 16px; font-weight: 700; padding: 4px 12px; border-radius: 10px;
         }
 
-        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px; }
         .stat { background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 14px; border: 1px solid rgba(255, 255, 255, 0.05); }
         .stat-label { color: rgba(255, 255, 255, 0.4); font-size: 10px; text-transform: uppercase; margin-bottom: 2px; }
         .stat-value { font-size: 15px; font-weight: 700; }
 
         .alarm-section { background: rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 15px; border: 1px solid rgba(255, 255, 255, 0.1); }
         
-        .alarm-header {
-            display: flex; justify-content: space-between; align-items: center; 
-            margin-bottom: 12px; height: 24px;
-        }
-
         .input-group {
             position: relative; flex: 1; display: flex; align-items: center;
             background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; padding-left: 10px; height: 48px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border-radius: 12px; padding-left: 10px; height: 48px; transition: all 0.3s;
         }
-
-        .input-group:focus-within {
-            border-color: rgba(255, 255, 255, 0.4);
-            background: rgba(0, 0, 0, 0.7);
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            transform: translateY(-1px);
-        }
-
-        .input-group .material-symbols-outlined {
-            font-size: 18px; color: rgba(255,255,255,0.3); flex-shrink: 0;
-            transition: color 0.3s ease;
-        }
-
-        .input-group:focus-within .material-symbols-outlined {
-            color: var(--accent-green);
-        }
+        .input-group:focus-within { border-color: rgba(255, 255, 255, 0.4); box-shadow: 0 0 15px rgba(255, 255, 255, 0.1); }
+        .input-group .material-symbols-outlined { color: rgba(255,255,255,0.3); font-size: 18px; }
+        .input-group:focus-within .material-symbols-outlined { color: var(--accent-green); }
 
         input[type="number"] {
             width: 100%; height: 100%; background: transparent; border: none;
             padding: 0 10px; color: #fff; outline: none; font-size: 16px;
         }
 
-        .action { flex: 1; border-radius: 12px; }
+        .action { flex: 1; height: 48px; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; transition: all 0.2s; }
         .btn-set { background: var(--accent-green); color: white; }
-        .btn-set:active { transform: scale(0.98); filter: brightness(1.2); }
         .btn-clear { background: rgba(248, 81, 73, 0.1); color: #ff7b7b; border: 1px solid rgba(248, 81, 73, 0.2); }
 
         .alarm-status { 
-            margin-top: 15px; padding: 14px; border-radius: 12px; font-size: 14px; 
-            text-align: center; display: none; font-weight: 800; color: #ffffff;
-            align-items: center; justify-content: center; gap: 8px;
+            margin-top: 15px; padding: 12px; border-radius: 10px; font-size: 13px; 
+            text-align: center; display: none; font-weight: 800;
+            align-items: center; justify-content: center; gap: 6px;
         }
 
         .footer { text-align: center; margin-top: 25px; color: rgba(255, 255, 255, 0.2); font-size: 10px; }
@@ -199,12 +162,12 @@
         </div>
 
         <div class="alarm-section">
-            <div class="alarm-header">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div style="display:flex; align-items:center; gap:6px; font-weight:600; font-size:14px;">
-                    <span class="material-symbols-outlined" style="color:#4ade80; font-size:24px;">notifications_active</span> Alerts
+                    <span class="material-symbols-outlined" style="color:#4ade80; font-size:20px;">notifications_active</span> Alerts
                 </div>
-                <button id="muteBtn" onclick="toggleMute()" style="background:none; border:none; padding:0; cursor:pointer; display:flex; align-items:center;">
-                    <span id="speakerIcon" class="material-symbols-outlined" style="color:rgba(255,255,255,0.4); font-size:24px;">volume_up</span>
+                <button id="muteBtn" onclick="toggleMute()" style="background:none; border:none; padding:5px; cursor:pointer;">
+                    <span id="speakerIcon" class="material-symbols-outlined" style="color:rgba(255,255,255,0.4)">volume_up</span>
                 </button>
             </div>
             <div style="display:flex; gap:8px;">
@@ -228,11 +191,8 @@
     </div>
 
     <script>
-        // Sama JavaScript-logiikka kuin v40:ssä
         let ws, currentCrypto = 'btc', currentView = '1h', lastAlarmTime = 0;
-        let statsData = {}, allAlarms = {}, triggeredState = {}, isMuted = false;
-        let liveTickerData = {}; 
-
+        let statsData = {}, allAlarms = {}, triggeredState = {}, isMuted = false, liveTickerData = {};
         const config = {
             btc: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', dec: 2, img: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
             sol: { name: 'Solana', symbol: 'SOL', pair: 'solusdt', dec: 2, img: 'https://assets.coingecko.com/coins/images/4128/large/solana.png' },
@@ -245,34 +205,23 @@
             const streams = Object.keys(config).map(k => `${config[k].pair}@ticker/${config[k].pair}@kline_1h`).join('/');
             ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
             ws.onmessage = e => {
-                const raw = JSON.parse(e.data);
-                const [symbol, type] = raw.stream.split('@');
-                const cKey = Object.keys(config).find(k => config[k].pair === symbol);
-                const d = raw.data;
-
+                const raw = JSON.parse(e.data), [symbol, type] = raw.stream.split('@'), cKey = Object.keys(config).find(k => config[k].pair === symbol), d = raw.data;
                 if (type === 'ticker') {
-                    const price = parseFloat(d.c);
-                    liveTickerData[cKey] = { price, p24h: d.P };
-                    updateMemory(cKey, '24h', d.h, d.l, d.q);
-                    if (cKey === currentCrypto) updateUIPrice();
+                    const price = parseFloat(d.c); liveTickerData[cKey] = { price, p24h: d.P };
+                    updateMemory(cKey, '24h', d.h, d.l, d.q); if (cKey === currentCrypto) updateUIPrice();
                     checkAllAlarms(cKey, price);
                 } else if (type === 'kline_1h') {
                     updateMemory(cKey, '1h', d.k.h, d.k.l, d.k.v * d.k.c);
-                    if (!statsData[cKey]) statsData[cKey] = {};
-                    statsData[cKey].open1h = parseFloat(d.k.o);
+                    if (!statsData[cKey]) statsData[cKey] = {}; statsData[cKey].open1h = parseFloat(d.k.o);
                 }
                 if (cKey === currentCrypto) updateStatsUI();
             };
         }
 
         function updateUIPrice() {
-            const data = liveTickerData[currentCrypto];
-            if (!data) return;
+            const data = liveTickerData[currentCrypto]; if (!data) return;
             document.getElementById('price').innerText = '$' + data.price.toLocaleString('en-US', {minimumFractionDigits: config[currentCrypto].dec});
-            let changePercent = (currentView === '1h' && statsData[currentCrypto]?.open1h) 
-                ? ((data.price - statsData[currentCrypto].open1h) / statsData[currentCrypto].open1h) * 100 
-                : parseFloat(data.p24h);
-
+            let changePercent = (currentView === '1h' && statsData[currentCrypto]?.open1h) ? ((data.price - statsData[currentCrypto].open1h) / statsData[currentCrypto].open1h) * 100 : parseFloat(data.p24h);
             const container = document.getElementById('priceChangeContainer');
             container.style.color = changePercent >= 0 ? '#4ade80' : '#ff6b6b';
             container.style.background = changePercent >= 0 ? 'rgba(74, 222, 128, 0.15)' : 'rgba(255, 107, 107, 0.15)';
@@ -289,86 +238,37 @@
 
         function triggerEffect(key, dir, price) {
             if (key !== currentCrypto) return;
-            if (!isMuted && Date.now() - lastAlarmTime > 5000) {
-                document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{});
-                lastAlarmTime = Date.now();
-            }
-            const s = document.getElementById('alarmStatus');
-            s.style.display = 'flex'; s.classList.add('trigger-active');
-            s.style.background = dir === 'up' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(248, 81, 73, 0.2)';
-            s.style.border = `1px solid ${dir === 'up' ? 'rgba(74, 222, 128, 0.6)' : 'rgba(248, 81, 73, 0.6)'}`;
-            s.innerHTML = `<span class="material-symbols-outlined" style="color:${dir === 'up' ? '#4ade80' : '#ff6b6b'}">${dir === 'up' ? 'trending_up' : 'trending_down'}</span> TARGET REACHED: $${price.toLocaleString()}`;
+            if (!isMuted && Date.now() - lastAlarmTime > 5000) { document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{}); lastAlarmTime = Date.now(); }
+            const s = document.getElementById('alarmStatus'); s.style.display = 'flex';
+            s.style.background = dir === 'up' ? 'rgba(35, 134, 54, 0.2)' : 'rgba(248, 81, 73, 0.2)';
+            s.innerHTML = `${dir==='up'?'UP':'DOWN'} $${price.toLocaleString()}`;
         }
 
-        function updateMemory(key, period, h, l, v) {
-            if (!statsData[key]) statsData[key] = {};
-            statsData[key][period] = { h: '$'+parseFloat(h).toLocaleString(), l: '$'+parseFloat(l).toLocaleString(), v: parseFloat(v).toLocaleString(undefined,{maximumFractionDigits:0}) };
-        }
+        function updateMemory(key, period, h, l, v) { if (!statsData[key]) statsData[key] = {}; statsData[key][period] = { h: '$'+parseFloat(h).toLocaleString(), l: '$'+parseFloat(l).toLocaleString(), v: parseFloat(v).toLocaleString(undefined,{maximumFractionDigits:0}) }; }
 
         function changeCrypto() {
-            currentCrypto = document.getElementById('cryptoSelect').value;
-            const c = config[currentCrypto];
-            document.getElementById('cryptoName').innerText = c.name;
-            document.getElementById('cryptoPair').innerText = c.symbol+'/USDT';
-            document.getElementById('cryptoIconImg').src = c.img;
-            document.getElementById('alarmStatus').style.display = 'none';
+            currentCrypto = document.getElementById('cryptoSelect').value; const c = config[currentCrypto];
+            document.getElementById('cryptoName').innerText = c.name; document.getElementById('cryptoPair').innerText = c.symbol+'/USDT';
+            document.getElementById('cryptoIconImg').src = c.img; document.getElementById('alarmStatus').style.display = 'none';
             loadSettings(); updateStatsUI(); updateUIPrice();
         }
 
-        function setAlarm() { 
-            allAlarms[currentCrypto] = { h: parseFloat(document.getElementById('alarmHigh').value) || null, l: parseFloat(document.getElementById('alarmLow').value) || null }; 
-            triggeredState[currentCrypto] = {h:false, l:false};
-            saveSettings(); updateAlarmUI(); 
-        }
-
-        function clearAlarm() { 
-            allAlarms[currentCrypto] = null; 
-            saveSettings(); updateAlarmUI(); 
-        }
-
-        function switchView(view) { 
-            currentView = view; 
-            document.getElementById('btn1h').classList.toggle('active', view === '1h'); 
-            document.getElementById('btn24h').classList.toggle('active', view === '24h'); 
-            updateStatsUI(); updateUIPrice();
-        }
-
-        function updateStatsUI() { 
-            const d = statsData[currentCrypto]?.[currentView]; 
-            if (d) { 
-                document.getElementById('valHigh').innerText = d.h; 
-                document.getElementById('valLow').innerText = d.l; 
-                document.getElementById('valVol').innerText = d.v; 
-            } 
-        }
-
+        function setAlarm() { allAlarms[currentCrypto] = { h: parseFloat(document.getElementById('alarmHigh').value) || null, l: parseFloat(document.getElementById('alarmLow').value) || null }; triggeredState[currentCrypto] = {h:false, l:false}; saveSettings(); updateAlarmUI(); }
+        function clearAlarm() { allAlarms[currentCrypto] = null; saveSettings(); updateAlarmUI(); }
+        function switchView(view) { currentView = view; document.getElementById('btn1h').classList.toggle('active', view === '1h'); document.getElementById('btn24h').classList.toggle('active', view === '24h'); updateStatsUI(); updateUIPrice(); }
+        function updateStatsUI() { const d = statsData[currentCrypto]?.[currentView]; if (d) { document.getElementById('valHigh').innerText = d.h; document.getElementById('valLow').innerText = d.l; document.getElementById('valVol').innerText = d.v; } }
         function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
-        function updateMuteUI() { 
-            const icon = document.getElementById('speakerIcon');
-            icon.innerText = isMuted ? 'volume_off' : 'volume_up';
-            icon.style.color = isMuted ? '#ff6b6b' : 'rgba(255,255,255,0.4)'; 
-        }
-        
-        function saveSettings() { 
-            localStorage.setItem('crypto_glass_v41', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); 
-        }
-        
+        function updateMuteUI() { document.getElementById('speakerIcon').style.color = isMuted ? '#ff6b6b' : 'rgba(255,255,255,0.4)'; }
+        function saveSettings() { localStorage.setItem('crypto_glass_v43', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
         function loadSettings() { 
-            const s = JSON.parse(localStorage.getItem('crypto_glass_v41') || '{}'); 
-            allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI();
-            const d = allAlarms[currentCrypto] || {}; 
-            document.getElementById('alarmHigh').value = d.h || ''; 
-            document.getElementById('alarmLow').value = d.l || ''; 
-            updateAlarmUI(); 
+            const s = JSON.parse(localStorage.getItem('crypto_glass_v43') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI();
+            const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); 
         }
 
         function updateAlarmUI() { 
-            const s = document.getElementById('alarmStatus'); 
-            const d = allAlarms[currentCrypto]; 
+            const s = document.getElementById('alarmStatus'); const d = allAlarms[currentCrypto]; 
             if (!d || (!d.h && !d.l)) { s.style.display = 'none'; return; } 
-            s.style.display = 'flex'; 
-            s.style.background = 'rgba(255, 255, 255, 0.05)'; 
-            s.style.border = '1px solid rgba(255, 255, 255, 0.1)';
+            s.style.display = 'flex'; s.style.background = 'rgba(88, 166, 255, 0.1)'; s.style.color = '#8bc3ff';
             s.innerHTML = `Alert Set for ${config[currentCrypto].symbol}`; 
         }
 
