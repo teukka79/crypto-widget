@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Price Widget - Multi-Alert Edition</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f0f1e 0%, #1a1a2e 100%);
+            display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px;
+        }
+        .widget {
+            background: rgba(22, 27, 34, 0.95);
+            border-radius: 24px; padding: 40px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1); max-width: 450px; width: 100%;
+        }
+        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 30px; }
+        .crypto-icon {
+            width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; font-weight: bold; color: white; font-size: 24px;
+            transition: all 0.3s; overflow: hidden; background: rgba(48, 54, 61, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+        .crypto-icon img { width: 100%; height: 100%; object-fit: cover; }
+        .title { color: #e6edf3; font-size: 24px; font-weight: 600; }
+        .subtitle { color: #8b949e; font-size: 14px; }
+        .crypto-selector { margin-bottom: 30px; }
+        select {
+            width: 100%; padding: 12px 16px; background: rgba(48, 54, 61, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px;
+            color: #e6edf3; font-size: 16px; cursor: pointer;
+        }
+        .price-display { text-align: center; margin: 30px 0; }
+        .price { font-size: 56px; font-weight: 700; color: #e6edf3; margin-bottom: 8px; font-variant-numeric: tabular-nums; }
+        .price-change { font-size: 18px; font-weight: 500; padding: 6px 16px; border-radius: 12px; display: inline-block; }
+        .price-change.positive { color: #3fb950; background: rgba(63, 185, 80, 0.1); }
+        .price-change.negative { color: #f85149; background: rgba(248, 81, 73, 0.1); }
+        .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 30px 0; }
+        .stat { background: rgba(48, 54, 61, 0.5); padding: 16px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .stat-label { color: #8b949e; font-size: 12px; text-transform: uppercase; margin-bottom: 6px; }
+        .stat-value { color: #e6edf3; font-size: 18px; font-weight: 600; }
+        .alarm-section { background: rgba(48, 54, 61, 0.5); border-radius: 16px; padding: 24px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .alarm-header { color: #e6edf3; font-size: 16px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .alarm-inputs { display: flex; gap: 12px; margin-bottom: 16px; }
+        input[type="number"] {
+            width: 100%; padding: 12px; background: rgba(22, 27, 34, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 8px; color: #e6edf3;
+        }
+        .alarm-buttons { display: flex; gap: 8px; }
+        button { flex: 1; padding: 12px 20px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; }
+        .btn-set { background: #238636; color: white; }
+        .btn-clear { background: rgba(248, 81, 73, 0.1); color: #f85149; border: 1px solid rgba(248, 81, 73, 0.3); }
+        .alarm-status { margin-top: 16px; padding: 12px; border-radius: 8px; font-size: 13px; display: none; }
+        .alarm-status.active { display: block; background: rgba(88, 166, 255, 0.1); color: #58a6ff; }
+        .alarm-status.triggered { display: block; background: rgba(248, 81, 73, 0.1); color: #f85149; animation: pulse 1s infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.6; } }
+        .connection-status { text-align: center; margin-top: 20px; color: #8b949e; font-size: 12px; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #3fb950; }
+        .status-dot.disconnected { background: #f85149; }
+        .last-update { text-align: center; margin-top: 8px; color: #6e7681; font-size: 11px; }
+    </style>
+</head>
+<body>
+    <div class="widget">
+        <audio id="audioHigh" src="super_mario_bros.mp3" preload="auto"></audio>
+        <audio id="audioLow" src="game_over_arcade_3.mp3" preload="auto"></audio>
+
+        <div class="header">
+            <div class="crypto-icon" id="cryptoIcon">
+                <img id="cryptoIconImg" src="" alt="Icon">
+            </div>
+            <div>
+                <div class="title" id="cryptoName">Bitcoin</div>
+                <div class="subtitle" id="cryptoPair">BTC/USDT</div>
+            </div>
+        </div>
+
+        <div class="crypto-selector">
+            <select id="cryptoSelect" onchange="changeCrypto()">
+                <option value="btc">Bitcoin (BTC)</option>
+                <option value="sol">Solana (SOL)</option>
+                <option value="sui">Sui (SUI)</option>
+                <option value="dot">Polkadot (DOT)</option>
+            </select>
+        </div>
+
+        <div class="price-display">
+            <div class="price" id="price">--</div>
+            <div class="price-change" id="priceChange">--</div>
+        </div>
+
+        <div class="stats">
+            <div class="stat"><div class="stat-label">24h High</div><div class="stat-value" id="high24h">--</div></div>
+            <div class="stat"><div class="stat-label">24h Low</div><div class="stat-value" id="low24h">--</div></div>
+            <div class="stat"><div class="stat-label">24h Volume</div><div class="stat-value" id="volume24h">--</div></div>
+            <div class="stat"><div class="stat-label">24h Change</div><div class="stat-value" id="change24h">--</div></div>
+        </div>
+
+        <div class="alarm-section">
+            <div class="alarm-header">🔔 Price Alert</div>
+            <div class="alarm-inputs">
+                <div class="input-group">
+                    <label style="color:#8b949e; font-size:12px">Above ($)</label>
+                    <input type="number" id="alarmHigh" placeholder="e.g. 105000">
+                </div>
+                <div class="input-group">
+                    <label style="color:#8b949e; font-size:12px">Below ($)</label>
+                    <input type="number" id="alarmLow" placeholder="e.g. 95000">
+                </div>
+            </div>
+            <div class="alarm-buttons">
+                <button class="btn-set" onclick="setAlarm()">Set Alert</button>
+                <button class="btn-clear" onclick="clearAlarm()">Clear</button>
+            </div>
+            <div class="alarm-status" id="alarmStatus"></div>
+        </div>
+
+        <div class="connection-status">
+            <span class="status-dot" id="statusDot"></span>
+            <span id="connectionText">Connecting...</span>
+        </div>
+        <div class="last-update" id="lastUpdate"></div>
+    </div>
+
+    <script>
+        let ws;
+        let currentPrice = 0;
+        let alarmHigh = null;
+        let alarmLow = null;
+        
+        // Tilanhallinta automaattista uudelleenlaukaisua varten
+        let highTriggered = false;
+        let lowTriggered = false;
+        
+        let currentCrypto = 'btc';
+
+        const cryptoConfig = {
+            btc: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', coingeckoId: 'bitcoin', gradient: 'linear-gradient(135deg, #f7931a 0%, #ff9500 100%)', decimals: 2 },
+            sol: { name: 'Solana', symbol: 'SOL', pair: 'solusdt', coingeckoId: 'solana', gradient: 'linear-gradient(135deg, #00d4aa 0%, #9945ff 100%)', decimals: 2 },
+            sui: { name: 'Sui', symbol: 'SUI', pair: 'suiusdt', coingeckoId: 'sui', gradient: 'linear-gradient(135deg, #4da2ff 0%, #0081c9 100%)', decimals: 4 },
+            dot: { name: 'Polkadot', symbol: 'DOT', pair: 'dotusdt', coingeckoId: 'polkadot', gradient: 'linear-gradient(135deg, #e6007a 0%, #ff1864 100%)', decimals: 3 }
+        };
+
+        function saveToLocalStorage() {
+            const data = { currentCrypto, alarmHigh, alarmLow };
+            localStorage.setItem('cryptoWidgetSettings', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const saved = localStorage.getItem('cryptoWidgetSettings');
+            if (saved) {
+                const data = JSON.parse(saved);
+                currentCrypto = data.currentCrypto || 'btc';
+                alarmHigh = data.alarmHigh || null;
+                alarmLow = data.alarmLow || null;
+                document.getElementById('cryptoSelect').value = currentCrypto;
+                document.getElementById('alarmHigh').value = alarmHigh || '';
+                document.getElementById('alarmLow').value = alarmLow || '';
+                if (alarmHigh || alarmLow) updateAlarmUI();
+            }
+        }
+
+        function changeCrypto() {
+            if (ws) {
+                ws.onmessage = null;
+                ws.close();
+            }
+            currentCrypto = document.getElementById('cryptoSelect').value;
+            currentPrice = 0;
+            highTriggered = false;
+            lowTriggered = false;
+            saveToLocalStorage();
+            updateStaticUI();
+            connectWebSocket();
+        }
+
+        function updateStaticUI() {
+            const config = cryptoConfig[currentCrypto];
+            document.getElementById('cryptoName').textContent = config.name;
+            document.getElementById('cryptoPair').textContent = config.symbol + '/USDT';
+            document.getElementById('cryptoIcon').style.background = config.gradient;
+            document.getElementById('price').textContent = 'Loading...';
+            
+            // Dynaamiset kuvakkeet CoinGeckosta
+            fetch(`https://api.coingecko.com/api/v3/coins/${config.coingeckoId}`)
+                .then(r => r.json())
+                .then(data => {
+                    const img = document.getElementById('cryptoIconImg');
+                    img.src = data.image.large;
+                    img.style.display = 'block';
+                });
+        }
+
+        function connectWebSocket() {
+            const pair = cryptoConfig[currentCrypto].pair;
+            ws = new WebSocket(`wss://stream.binance.com:9443/ws/${pair}@ticker`);
+            
+            ws.onopen = () => {
+                document.getElementById('statusDot').classList.remove('disconnected');
+                document.getElementById('connectionText').textContent = `Live: ${cryptoConfig[currentCrypto].symbol}`;
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                currentPrice = parseFloat(data.c);
+                const config = cryptoConfig[currentCrypto];
+                
+                document.getElementById('price').textContent = '$' + currentPrice.toLocaleString('en-US', {
+                    minimumFractionDigits: config.decimals
+                });
+
+                const change = parseFloat(data.P);
+                const changeEl = document.getElementById('priceChange');
+                changeEl.textContent = (change >= 0 ? '+' : '') + change.toFixed(2) + '%';
+                changeEl.className = `price-change ${change >= 0 ? 'positive' : 'negative'}`;
+
+                document.getElementById('high24h').textContent = '$' + parseFloat(data.h).toLocaleString();
+                document.getElementById('low24h').textContent = '$' + parseFloat(data.l).toLocaleString();
+                
+                checkAlarm();
+                document.getElementById('lastUpdate').textContent = 'Last update: ' + new Date().toLocaleTimeString();
+            };
+        }
+
+        function setAlarm() {
+            alarmHigh = document.getElementById('alarmHigh').value ? parseFloat(document.getElementById('alarmHigh').value) : null;
+            alarmLow = document.getElementById('alarmLow').value ? parseFloat(document.getElementById('alarmLow').value) : null;
+            
+            // Nollataan liipaisimet kun uusi hälytys asetetaan
+            highTriggered = false;
+            lowTriggered = false;
+            
+            saveToLocalStorage();
+            updateAlarmUI();
+        }
+
+        function updateAlarmUI() {
+            const status = document.getElementById('alarmStatus');
+            if (!alarmHigh && !alarmLow) {
+                status.className = 'alarm-status';
+                return;
+            }
+            status.textContent = `Alert active for ${cryptoConfig[currentCrypto].symbol}`;
+            status.className = 'alarm-status active';
+        }
+
+        function clearAlarm() {
+            alarmHigh = null; alarmLow = null;
+            highTriggered = false; lowTriggered = false;
+            document.getElementById('alarmHigh').value = '';
+            document.getElementById('alarmLow').value = '';
+            document.getElementById('alarmStatus').className = 'alarm-status';
+            
+            document.getElementById('audioHigh').pause();
+            document.getElementById('audioHigh').currentTime = 0;
+            document.getElementById('audioLow').pause();
+            document.getElementById('audioLow').currentTime = 0;
+            
+            saveToLocalStorage();
+        }
+
+        function checkAlarm() {
+            if (!alarmHigh && !alarmLow) return;
+
+            // YLÄRAJA:
+            if (alarmHigh) {
+                if (currentPrice >= alarmHigh && !highTriggered) {
+                    highTriggered = true; // Lukitaan, ettei soi jokaisella tikillä
+                    triggerAlarm('audioHigh');
+                } else if (currentPrice < alarmHigh) {
+                    highTriggered = false; // Vapautetaan lukitus, kun hinta laskee rajan alle
+                }
+            }
+
+            // ALARAJA:
+            if (alarmLow) {
+                if (currentPrice <= alarmLow && !lowTriggered) {
+                    lowTriggered = true; 
+                    triggerAlarm('audioLow');
+                } else if (currentPrice > alarmLow) {
+                    lowTriggered = false;
+                }
+            }
+        }
+
+        function triggerAlarm(audioId) {
+            const status = document.getElementById('alarmStatus');
+            status.textContent = `🚨 TRIGGERED: $${currentPrice.toLocaleString()}`;
+            status.className = 'alarm-status triggered';
+            
+            const audio = document.getElementById(audioId);
+            audio.currentTime = 0; // Aloita alusta jos soi jo
+            audio.play().catch(e => console.log("Audio play failed: ", e));
+        }
+
+        window.onload = () => {
+            loadFromLocalStorage();
+            updateStaticUI();
+            connectWebSocket();
+        };
+    </script>
+</body>
+</html>
