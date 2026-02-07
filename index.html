@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Crypto Glass v55.8.2 - iPhone 13 Masterpiece</title>
+    <title>Crypto Glass v55.8.4 - Final Masterpiece</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -28,12 +28,19 @@
             background-attachment: fixed; background-size: cover;
         }
 
-        /* --- UI PUHDISTUS --- */
-        input::-webkit-outer-spin-button,
-        input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
         input[type=number] { -moz-appearance: textfield; }
         input:focus, select:focus, button:focus { outline: none; border: 1px solid rgba(255,255,255,0.15) !important; }
 
+        /* --- ANIMAATIOT --- */
+        @keyframes reveal-slide {
+            0% { clip-path: inset(0 100% 0 0); transform: translateX(-20px); opacity: 0; }
+            100% { clip-path: inset(0 0 0 0); transform: translateX(0); opacity: 1; }
+        }
+        @keyframes soft-text-glow {
+            0%, 100% { text-shadow: 0 0 8px rgba(74, 222, 128, 0.4); }
+            50% { text-shadow: 0 0 20px rgba(74, 222, 128, 1), 0 0 2px #fff; }
+        }
         @keyframes bell-swing {
             0% { transform: rotate(0); }
             20% { transform: rotate(18deg); }
@@ -47,16 +54,20 @@
         /* --- HÄLYTYSIKKUNA --- */
         .glass-alert {
             position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-150%);
-            width: 88%; max-width: 350px; padding: 16px 20px; border-radius: 20px;
+            width: 88%; max-width: 350px; padding: 18px 22px; border-radius: 20px;
             backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
-            display: flex; align-items: center; gap: 12px; z-index: 12000;
+            display: flex; align-items: center; gap: 14px; z-index: 12000;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
             box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
             border: 1px solid rgba(255,255,255,0.15);
-            opacity: 0; color: #ffffff; font-weight: 800; 
-            background: rgba(34, 197, 94, 0.35);
+            opacity: 0; color: #ffffff; font-weight: 900; 
+            background: rgba(34, 197, 94, 0.4);
         }
         .glass-alert.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+        .glass-alert.show #alertText { 
+            display: inline-block;
+            animation: reveal-slide 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards, soft-text-glow 1.5s infinite ease-in-out 0.8s;
+        }
 
         /* --- WIDGET --- */
         .widget {
@@ -70,8 +81,8 @@
         .header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
         .crypto-icon { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
         .crypto-icon img { width: 100%; height: 100%; object-fit: contain; }
-        #cryptoName { font-weight: 900; font-size: 22px; line-height: 1.1; }
-        #cryptoPair { font-size: 12px; opacity: 0.6; font-weight: 600; margin-top: 2px; }
+        #cryptoName { font-weight: 900; font-size: 22px; }
+        #cryptoPair { font-size: 12px; opacity: 0.6; font-weight: 600; }
 
         .select-row { display: flex; gap: 8px; margin-bottom: 15px; }
         select { flex: 1; height: 48px; padding: 0 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 15px; font-weight: 800; appearance: none; }
@@ -220,7 +231,7 @@
             
             if (hit && !isMuted && (now - lastAudioTime > 30000)) {
                 audioUp.play(); lastAudioTime = now;
-                showGlassAlert(`${config[cKey].symbol} Target Hit!`, true);
+                showGlassAlert(`${config[cKey].symbol} TARGET!`, true);
                 const wb = document.getElementById('widgetBell');
                 wb.classList.add('swinging');
                 setTimeout(() => wb.classList.remove('swinging'), 10000);
@@ -240,10 +251,15 @@
         function showGlassAlert(msg, isTarget) {
             const box = document.getElementById('alertBox');
             const icon = document.getElementById('alertIcon');
-            document.getElementById('alertText').innerText = msg;
+            const txt = document.getElementById('alertText');
+            txt.innerText = msg;
             icon.innerText = isTarget ? "notifications_active" : "notifications";
+            if (isTarget) icon.classList.add('swinging');
             box.classList.add('show');
-            setTimeout(() => box.classList.remove('show'), 5000);
+            setTimeout(() => {
+                box.classList.remove('show');
+                setTimeout(() => icon.classList.remove('swinging'), 600);
+            }, 5000);
         }
 
         async function fetch1hData(cKey) {
