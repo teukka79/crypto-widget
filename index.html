@@ -238,7 +238,7 @@
             
             if (hit && !isMuted && (now - lastAudioTime > 30000)) {
                 audioUp.play(); lastAudioTime = now;
-                showGlassAlert(`${config[cKey].symbol} TARGET!`, true);
+                showGlassAlert(`${config[cKey].symbol} Target Hit!`, true);
                 const wb = document.getElementById('widgetBell');
                 wb.classList.add('swinging');
                 setTimeout(() => wb.classList.remove('swinging'), 10000);
