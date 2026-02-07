@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v59</title>
+    <title>Crypto Glass Mobile v60</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -65,11 +65,13 @@
         .title { font-size: 24px; font-weight: 700; }
         .subtitle { color: rgba(255, 255, 255, 0.5); font-size: 14px; }
 
+        /* KORJATTU SELECT v60 */
         select {
-            width: 100%; height: 120px; padding: 0 15px; background: rgba(0, 0, 0, 0.6); 
-            border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 16px;
-            color: #fff; appearance: none; margin-bottom: 25px; font-size: 20px; font-weight: 600; outline: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z'/%3E%3C/svg%3E");
+            width: 100%; height: 64px !important; line-height: 64px; padding: 0 15px; 
+            background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 16px;
+            color: #fff; appearance: none; -webkit-appearance: none; -moz-appearance: none;
+            margin-bottom: 25px; font-size: 22px; font-weight: 700; outline: none;
+            display: block; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z'/%3E%3C/svg%3E");
             background-repeat: no-repeat; background-position: right 15px center;
         }
 
@@ -298,9 +300,9 @@
         function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
         function updateMuteUI() { const icon = document.getElementById('speakerIcon'); icon.innerText = isMuted ? 'volume_off' : 'volume_up'; icon.style.color = isMuted ? '#ff6b6b' : 'rgba(255,255,255,0.4)'; }
         
-        function saveSettings() { localStorage.setItem('crypto_glass_v59', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
+        function saveSettings() { localStorage.setItem('crypto_glass_v60', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
         function loadSettings() { 
-            const s = JSON.parse(localStorage.getItem('crypto_glass_v59') || localStorage.getItem('crypto_glass_v58') || '{}'); 
+            const s = JSON.parse(localStorage.getItem('crypto_glass_v60') || localStorage.getItem('crypto_glass_v59') || '{}'); 
             allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI(); 
             const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); 
         }
