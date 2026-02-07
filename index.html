@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Crypto Glass v55.8.5 - Final Masterpiece</title>
+    <title>Crypto Glass v55.8.9 - Clean Masterpiece</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -12,6 +12,16 @@
             --static-green-text: #4ade80;
             --static-red-text: #f87171;
             --glass-border: rgba(255, 255, 255, 0.06); 
+        }
+
+        /* --- POISTETAAN INPUT-NUOLET --- */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
@@ -28,10 +38,6 @@
             background-attachment: fixed; background-size: cover;
         }
 
-        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        input[type=number] { -moz-appearance: textfield; }
-        input:focus, select:focus, button:focus { outline: none; border: 1px solid rgba(255,255,255,0.15) !important; }
-
         /* --- ANIMAATIOT --- */
         @keyframes reveal-slide {
             0% { clip-path: inset(0 100% 0 0); transform: translateX(-20px); opacity: 0; }
@@ -43,7 +49,7 @@
         }
         @keyframes white-glow {
             0%, 100% { text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
-            50% { text-shadow: 0 0 20px rgba(255, 255, 255, 1), 0 0 5px rgba(255, 255, 255, 0.8); }
+            50% { text-shadow: 0 0 22px rgba(255, 255, 255, 1), 0 0 5px rgba(255, 255, 255, 0.8); }
         }
         @keyframes bell-swing {
             0% { transform: rotate(0); }
@@ -53,6 +59,12 @@
             80% { transform: rotate(-12deg); }
             100% { transform: rotate(0); }
         }
+        @keyframes double-pulse {
+            0% { transform: scale(1); opacity: 1; }
+            70% { transform: scale(2.8); opacity: 0; }
+            100% { transform: scale(1); opacity: 0; }
+        }
+
         .swinging { animation: bell-swing 0.6s ease-in-out infinite !important; }
 
         /* --- HÄLYTYSIKKUNA --- */
@@ -62,20 +74,18 @@
             backdrop-filter: blur(35px); -webkit-backdrop-filter: blur(35px);
             display: flex; align-items: center; gap: 14px; z-index: 12000;
             transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.6); 
-            border: 1px solid rgba(255,255,255,0.15);
-            opacity: 0; color: #ffffff; font-weight: 900; 
-            background: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.6); border: 1px solid rgba(255,255,255,0.15);
+            opacity: 0; color: #ffffff; font-weight: 900; background: rgba(34, 197, 94, 0.4);
         }
         .glass-alert.show { transform: translateX(-50%) translateY(0); opacity: 1; }
         .glass-alert.show #alertText { 
             display: inline-block;
             animation: reveal-slide 0.8s cubic-bezier(0.23, 1, 0.32, 1) forwards, soft-text-glow 1.5s infinite ease-in-out 0.8s;
         }
-        #alertIcon { color: #ffffff; text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
+        #alertIcon { color: #ffffff !important; text-shadow: 0 0 10px rgba(255, 255, 255, 0.6); }
         #alertIcon.swinging { animation: bell-swing 0.6s ease-in-out infinite, white-glow 1.5s infinite ease-in-out; }
 
-        /* --- WIDGET --- */
+        /* --- WIDGET RAKENNE --- */
         .widget {
             position: relative; width: 100%; max-width: 390px; height: 100vh;
             margin: 0 auto; padding: 15px; padding-top: calc(env(safe-area-inset-top) + 20px);
@@ -91,10 +101,10 @@
         #cryptoPair { font-size: 12px; opacity: 0.6; font-weight: 600; }
 
         .select-row { display: flex; gap: 8px; margin-bottom: 15px; }
-        select { flex: 1; height: 48px; padding: 0 12px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 15px; font-weight: 800; appearance: none; }
+        select { flex: 1; height: 48px; background: rgba(0, 0, 0, 0.4); border: 1px solid var(--glass-border); border-radius: 12px; color: #fff; font-size: 15px; font-weight: 800; appearance: none; padding: 0 12px; }
 
         .tf-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .tf-btn { height: 48px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); }
+        .tf-btn { height: 48px; border: none; border-radius: 12px; font-weight: 800; background: rgba(255, 255, 255, 0.05); color: rgba(255, 255, 255, 0.4); }
         .tf-btn.active { background: rgba(34, 197, 94, 0.4); color: #fff; }
 
         .price-display { text-align: center; margin-bottom: 15px; }
@@ -104,10 +114,21 @@
         .stat { background: rgba(0, 0, 0, 0.4); padding: 10px; border-radius: 14px; border: 1px solid var(--glass-border); }
 
         .alarm-section { background: rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); margin-bottom: 15px; }
-        .alarm-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
-        .alarm-grid input { height: 48px; border-radius: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; text-align: center; font-weight: 800; width: 100%; font-size: 14px; }
+        .alarm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        .alarm-grid input { 
+            height: 52px; 
+            border-radius: 12px; 
+            background: rgba(0,0,0,0.4); 
+            border: 1px solid var(--glass-border); 
+            color: #fff; 
+            text-align: center; 
+            font-weight: 800; 
+            width: 100%; 
+            font-size: 16px; 
+        }
 
-        .btn-static { height: 48px; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; display: flex; align-items: center; justify-content: center; width: 100%; font-size: 14px; }
+        .btn-static { height: 48px; border: none; border-radius: 12px; font-weight: 800; width: 100%; }
         .static-green { background: rgba(34, 197, 94, 0.15); color: var(--static-green-text); }
         .static-red { background: rgba(239, 68, 68, 0.15); color: var(--static-red-text); }
 
@@ -116,8 +137,16 @@
         #muteBtn.muted { color: var(--static-red-text); }
         #widgetBell.swinging { color: var(--static-green-text) !important; }
 
-        .footer { display: flex; justify-content: center; margin-top: auto; padding-bottom: 25px; }
-        .live-status-bar { display: flex; align-items: center; gap: 10px; background: rgba(255, 255, 255, 0.03); padding: 8px 16px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        .footer { display: flex; justify-content: center; margin-top: auto; padding-bottom: 30px; }
+        .live-status-bar { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
+        
+        .pulse-container { position: relative; width: 8px; height: 8px; }
+        .pulse-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; position: relative; z-index: 2; }
+        .pulse-ring { 
+            position: absolute; width: 100%; height: 100%; background: #4ade80; border-radius: 50%; 
+            animation: double-pulse 2s infinite ease-out; opacity: 0; top:0; left:0;
+        }
+        .pulse-ring:nth-child(2) { animation-delay: 1s; }
     </style>
 </head>
 <body>
@@ -131,10 +160,7 @@
     <div class="widget">
         <div class="header">
             <div class="crypto-icon"><img id="cryptoIconImg" src=""></div>
-            <div>
-                <div id="cryptoName">BTC</div>
-                <div id="cryptoPair">BTC/USDT</div>
-            </div>
+            <div><div id="cryptoName">BTC</div><div id="cryptoPair">BTC/USDT</div></div>
         </div>
 
         <div class="select-row">
@@ -177,16 +203,18 @@
 
         <div class="footer">
             <div class="live-status-bar">
-                <div style="width:8px; height:8px; background:#4ade80; border-radius:50%;"></div>
-                <div id="liveClock" style="font-weight:800; font-size:14px;">00:00:00</div>
+                <div class="pulse-container">
+                    <div class="pulse-dot"></div>
+                    <div class="pulse-ring"></div>
+                    <div class="pulse-ring"></div>
+                </div>
+                <div id="liveClock" style="font-weight:800; font-size:14px; letter-spacing: 0.5px;">00:00:00</div>
             </div>
         </div>
     </div>
 
     <script>
-        let ws, currentCrypto = 'btc', currentTimeframe = '24h', alarms = {}, timeframeData = {'1h':'0.00','24h':'0.00'}, isMuted = false, hourlyBasePrice = 0;
-        let lastAudioTime = 0, currentLiveVol = "--", hourlyVolume = "--", alertStates = {}; 
-
+        let ws, currentCrypto = 'btc', currentTimeframe = '24h', alarms = {}, timeframeData = {'1h':'0.00','24h':'0.00'}, isMuted = false, hourlyBasePrice = 0, lastAudioTime = 0, currentLiveVol = "--", hourlyVolume = "--", alertStates = {}; 
         let config = { btc: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', source: 'binance' } };
         const audioUp = new Audio('https://raw.githubusercontent.com/teukka79/crypto-widget/main/price_up.mp3');
 
@@ -235,7 +263,6 @@
             let hit = false;
             if (a.high && p >= a.high) { if (!alertStates[cKey].h) { hit = true; alertStates[cKey].h = true; } } else { alertStates[cKey].h = false; }
             if (a.low && p <= a.low) { if (!alertStates[cKey].l) { hit = true; alertStates[cKey].l = true; } } else { alertStates[cKey].l = false; }
-            
             if (hit && !isMuted && (now - lastAudioTime > 30000)) {
                 audioUp.play(); lastAudioTime = now;
                 showGlassAlert(`${config[cKey].symbol} Target Hit!`, true);
@@ -248,8 +275,7 @@
         function setAlarm() { 
             alarms[currentCrypto] = { high: document.getElementById('alarmHigh').value, low: document.getElementById('alarmLow').value }; 
             alertStates[currentCrypto] = { h: false, l: false }; 
-            save(); 
-            showGlassAlert("ALARM SET!", false); 
+            save(); showGlassAlert("ALARM SET!", false); 
             const wb = document.getElementById('widgetBell');
             wb.classList.add('swinging');
             setTimeout(() => wb.classList.remove('swinging'), 600);
@@ -258,15 +284,11 @@
         function showGlassAlert(msg, isTarget) {
             const box = document.getElementById('alertBox');
             const icon = document.getElementById('alertIcon');
-            const txt = document.getElementById('alertText');
-            txt.innerText = msg;
+            document.getElementById('alertText').innerText = msg;
             icon.innerText = isTarget ? "notifications_active" : "notifications";
             if (isTarget) icon.classList.add('swinging');
             box.classList.add('show');
-            setTimeout(() => {
-                box.classList.remove('show');
-                setTimeout(() => icon.classList.remove('swinging'), 600);
-            }, 5000);
+            setTimeout(() => { box.classList.remove('show'); setTimeout(() => icon.classList.remove('swinging'), 600); }, 5000);
         }
 
         async function fetch1hData(cKey) {
@@ -303,7 +325,16 @@
 
         function openAddModal() {
             document.getElementById('modalOverlay').style.display = 'flex';
-            document.getElementById('modalContainer').innerHTML = `<h3>Add Token</h3><input type="text" id="modalInput" style="width:100%; height:48px; background:rgba(255,255,255,0.05); color:#fff; text-align:center; border:1px solid var(--glass-border); border-radius:12px; margin-bottom:15px;" placeholder="Symbol"><div style="display:flex; gap:10px;"><button class="btn-static static-green" onclick="confirmAdd()">Add</button><button class="btn-static static-red" onclick="closeModal()">Back</button></div>`;
+            document.getElementById('modalContainer').innerHTML = `
+                <h3 style="margin-top:0; font-weight:900; letter-spacing:-0.5px;">Add Token</h3>
+                <input type="text" id="modalInput" 
+                    style="width:100%; height:54px; background:rgba(255,255,255,0.05); color:#fff; text-align:center; border:1px solid var(--glass-border); border-radius:14px; margin-bottom:20px; font-size:18px; font-weight:800; text-transform: uppercase;" 
+                    placeholder="SYMBOL" autocomplete="off">
+                <div style="display:flex; gap:10px;">
+                    <button class="btn-static static-green" onclick="confirmAdd()" style="height:50px;">Add</button>
+                    <button class="btn-static static-red" onclick="closeModal()" style="height:50px;">Back</button>
+                </div>`;
+            setTimeout(() => document.getElementById('modalInput').focus(), 100);
         }
 
         function confirmAdd() {
