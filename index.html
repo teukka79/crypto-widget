@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v51</title>
+    <title>Crypto Glass Mobile v54</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
             --forest-green: hsla(150, 80%, 15%, 0.8);
             --midnight-blue: hsla(220, 100%, 10%, 0.8);
             --accent-green: #238636;
-            --focus-glow: rgba(35, 134, 54, 0.4);
             --live-color: #4ade80;
+            --trigger-color: #4ade80; /* Dynaaminen hehkun väri */
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -44,9 +44,17 @@
             margin-top: 20px; padding: 25px; border-radius: 28px; 
             background: rgba(10, 15, 25, 0.45); 
             backdrop-filter: blur(45px); -webkit-backdrop-filter: blur(45px);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 20px 50px rgba(0, 0, 0, 0.5);
             overflow: visible;
+        }
+
+        .widget::after {
+            content: ""; position: absolute; inset: -1px; border-radius: 28px; padding: 1px;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent 40%, transparent 60%, rgba(255,255,255,0.1));
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
         }
 
         .widget::before {
@@ -54,9 +62,7 @@
             z-index: -1; border-radius: 28px;
             background-image: 
                 radial-gradient(at 5% 5%, var(--forest-green) 0px, transparent 65%),
-                radial-gradient(at 95% 5%, var(--midnight-blue) 0px, transparent 65%),
-                radial-gradient(at 95% 95%, var(--forest-green) 0px, transparent 65%),
-                radial-gradient(at 5% 95%, var(--midnight-blue) 0px, transparent 65%);
+                radial-gradient(at 95% 5%, var(--midnight-blue) 0px, transparent 65%);
         }
 
         .header { display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
@@ -96,47 +102,32 @@
         .input-group {
             position: relative; flex: 1; display: flex; align-items: center;
             background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px; padding-left: 10px; height: 52px;
+            border-radius: 12px; padding-left: 10px; height: 52px; transition: border-color 0.2s;
         }
-        input[type="number"] {
-            width: 100%; height: 100%; background: transparent; border: none;
-            padding: 0 10px; color: #fff; outline: none; font-size: 18px;
-        }
+        .input-group .material-symbols-outlined { color: rgba(255,255,255,0.2); font-size: 20px; transition: color 0.2s; }
+        .input-group:focus-within .material-symbols-outlined { color: rgba(255,255,255,0.4); }
+
+        input[type="number"] { width: 100%; height: 100%; background: transparent; border: none; padding: 0 10px; color: #fff; outline: none; font-size: 18px; }
+        input[type="number"]::placeholder { color: rgba(255, 255, 255, 0.2); }
 
         .action { flex: 1; height: 52px; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; font-size: 18px; }
         .btn-set { background: var(--accent-green); color: white; }
         .btn-clear { background: rgba(248, 81, 73, 0.1); color: #ff7b7b; border: 1px solid rgba(248, 81, 73, 0.2); }
 
-        .alarm-status { 
-            margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 14px; 
-            text-align: center; display: none; font-weight: 800;
-            align-items: center; justify-content: center; gap: 8px;
-        }
+        .alarm-status { margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 14px; text-align: center; display: none; font-weight: 800; align-items: center; justify-content: center; gap: 8px; }
 
-        .footer { 
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            margin-top: 25px; color: rgba(255, 255, 255, 0.2); font-size: 11px; font-weight: 500;
-        }
-        .live-dot {
-            width: 8px; height: 8px; background-color: var(--live-color);
-            border-radius: 50%; position: relative; transition: background-color 0.4s ease;
-        }
-        .live-dot::after {
-            content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            border-radius: 50%; background-color: var(--live-color);
-            animation: livePulse 2s infinite ease-out;
-        }
-        @keyframes livePulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(3); opacity: 0; }
-        }
-
-        @keyframes triggerPulse {
-            0% { transform: scale(1); box-shadow: 0 0 0 0px rgba(74, 222, 128, 0.4); }
-            50% { transform: scale(1.02); }
-            100% { transform: scale(1); box-shadow: 0 0 0 10px rgba(74, 222, 128, 0); }
+        /* DYNAAMINEN HEHKU-ANIMAAATIO */
+        @keyframes triggerPulse { 
+            0% { transform: scale(1); box-shadow: 0 0 0 0px var(--trigger-color); opacity: 1; } 
+            50% { transform: scale(1.02); } 
+            100% { transform: scale(1); box-shadow: 0 0 0 15px transparent; } 
         }
         .trigger-active { animation: triggerPulse 1.5s infinite ease-in-out; }
+
+        .footer { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 25px; color: rgba(255, 255, 255, 0.2); font-size: 11px; font-weight: 500; }
+        .live-dot { width: 8px; height: 8px; background-color: var(--live-color); border-radius: 50%; position: relative; transition: background-color 0.4s ease; }
+        .live-dot::after { content: ""; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border-radius: 50%; background-color: var(--live-color); animation: livePulse 2s infinite ease-out; }
+        @keyframes livePulse { 0% { transform: scale(1); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
     </style>
 </head>
 <body>
@@ -223,16 +214,9 @@
         function updateStatus(state) {
             const root = document.documentElement;
             const text = document.getElementById('statusText');
-            if (state === 'online') {
-                root.style.setProperty('--live-color', '#4ade80');
-                text.innerText = 'Live Update';
-            } else if (state === 'reconnecting') {
-                root.style.setProperty('--live-color', '#fbbf24');
-                text.innerText = 'Reconnecting...';
-            } else {
-                root.style.setProperty('--live-color', '#ff6b6b');
-                text.innerText = 'Connection Lost';
-            }
+            if (state === 'online') { root.style.setProperty('--live-color', '#4ade80'); text.innerText = 'Live Update'; }
+            else if (state === 'reconnecting') { root.style.setProperty('--live-color', '#fbbf24'); text.innerText = 'Reconnecting...'; }
+            else { root.style.setProperty('--live-color', '#ff6b6b'); text.innerText = 'Connection Lost'; }
         }
 
         function connect() {
@@ -240,9 +224,7 @@
             updateStatus('reconnecting');
             const streams = Object.keys(config).map(k => `${config[k].pair}@ticker/${config[k].pair}@kline_1h`).join('/');
             ws = new WebSocket(`wss://stream.binance.com:9443/stream?streams=${streams}`);
-            
             ws.onopen = () => updateStatus('online');
-            
             ws.onmessage = e => {
                 const raw = JSON.parse(e.data), [symbol, type] = raw.stream.split('@'), cKey = Object.keys(config).find(k => config[k].pair === symbol), d = raw.data;
                 if (type === 'ticker') {
@@ -255,11 +237,7 @@
                 }
                 if (cKey === currentCrypto) updateStatsUI();
             };
-
-            ws.onclose = () => {
-                updateStatus('reconnecting');
-                setTimeout(connect, 5000); 
-            };
+            ws.onclose = () => { updateStatus('reconnecting'); setTimeout(connect, 5000); };
             ws.onerror = () => updateStatus('error');
         }
 
@@ -283,59 +261,33 @@
 
         function triggerEffect(key, dir, price) {
             if (key !== currentCrypto) return;
+            const root = document.documentElement;
             if (!isMuted && Date.now() - lastAlarmTime > 5000) { document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{}); lastAlarmTime = Date.now(); }
-            const s = document.getElementById('alarmStatus'); 
-            s.style.display = 'flex'; s.classList.add('trigger-active');
-            if (dir === 'up') {
-                s.style.background = 'rgba(74, 222, 128, 0.2)'; s.style.border = '1px solid #4ade80'; s.style.color = '#ffffff';
-                s.innerHTML = `<span class="material-symbols-outlined" style="color:#4ade80; font-weight:bold;">trending_up</span> TARGET: $${price.toLocaleString()}`;
-            } else {
-                s.style.background = 'rgba(248, 81, 73, 0.2)'; s.style.border = '1px solid #f85149'; s.style.color = '#ffffff';
-                s.innerHTML = `<span class="material-symbols-outlined" style="color:#ff6b6b; font-weight:bold;">trending_down</span> TARGET: $${price.toLocaleString()}`;
+            const s = document.getElementById('alarmStatus'); s.style.display = 'flex'; s.classList.add('trigger-active');
+            
+            if (dir === 'up') { 
+                root.style.setProperty('--trigger-color', 'rgba(74, 222, 128, 0.6)'); // Vihreä hehku
+                s.style.background = 'rgba(74, 222, 128, 0.2)'; s.style.border = '1px solid #4ade80'; s.style.color = '#ffffff'; 
+                s.innerHTML = `<span class="material-symbols-outlined" style="color:#4ade80; font-weight:bold;">trending_up</span> TARGET: $${price.toLocaleString()}`; 
+            } 
+            else { 
+                root.style.setProperty('--trigger-color', 'rgba(248, 81, 73, 0.6)'); // Punainen hehku
+                s.style.background = 'rgba(248, 81, 73, 0.2)'; s.style.border = '1px solid #f85149'; s.style.color = '#ffffff'; 
+                s.innerHTML = `<span class="material-symbols-outlined" style="color:#ff6b6b; font-weight:bold;">trending_down</span> TARGET: $${price.toLocaleString()}`; 
             }
         }
 
-        function updateMemory(key, period, h, l, v) { 
-            if (!statsData[key]) statsData[key] = {}; 
-            statsData[key][period] = { 
-                h: '$'+parseFloat(h).toLocaleString(), 
-                l: '$'+parseFloat(l).toLocaleString(), 
-                v: '$'+parseFloat(v).toLocaleString(undefined,{maximumFractionDigits:0}) 
-            }; 
-        }
-
-        function changeCrypto() {
-            currentCrypto = document.getElementById('cryptoSelect').value; const c = config[currentCrypto];
-            document.getElementById('cryptoName').innerText = c.name; document.getElementById('cryptoPair').innerText = c.symbol+'/USDT';
-            document.getElementById('cryptoIconImg').src = c.img; document.getElementById('alarmStatus').style.display = 'none';
-            document.getElementById('alarmStatus').classList.remove('trigger-active');
-            loadSettings(); updateStatsUI(); updateUIPrice();
-        }
-
+        function updateMemory(key, period, h, l, v) { if (!statsData[key]) statsData[key] = {}; statsData[key][period] = { h: '$'+parseFloat(h).toLocaleString(), l: '$'+parseFloat(l).toLocaleString(), v: '$'+parseFloat(v).toLocaleString(undefined,{maximumFractionDigits:0}) }; }
+        function changeCrypto() { currentCrypto = document.getElementById('cryptoSelect').value; const c = config[currentCrypto]; document.getElementById('cryptoName').innerText = c.name; document.getElementById('cryptoPair').innerText = c.symbol+'/USDT'; document.getElementById('cryptoIconImg').src = c.img; document.getElementById('alarmStatus').style.display = 'none'; document.getElementById('alarmStatus').classList.remove('trigger-active'); loadSettings(); updateStatsUI(); updateUIPrice(); }
         function setAlarm() { allAlarms[currentCrypto] = { h: parseFloat(document.getElementById('alarmHigh').value) || null, l: parseFloat(document.getElementById('alarmLow').value) || null }; triggeredState[currentCrypto] = {h:false, l:false}; saveSettings(); updateAlarmUI(); }
         function clearAlarm() { allAlarms[currentCrypto] = null; saveSettings(); updateAlarmUI(); }
         function switchView(view) { currentView = view; document.getElementById('btn1h').classList.toggle('active', view === '1h'); document.getElementById('btn24h').classList.toggle('active', view === '24h'); updateStatsUI(); updateUIPrice(); }
         function updateStatsUI() { const d = statsData[currentCrypto]?.[currentView]; if (d) { document.getElementById('valHigh').innerText = d.h; document.getElementById('valLow').innerText = d.l; document.getElementById('valVol').innerText = d.v; } }
         function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
-        function updateMuteUI() { 
-            const icon = document.getElementById('speakerIcon');
-            if (isMuted) { icon.innerText = 'volume_off'; icon.style.color = '#ff6b6b'; } 
-            else { icon.innerText = 'volume_up'; icon.style.color = 'rgba(255,255,255,0.4)'; }
-        }
-
-        function saveSettings() { localStorage.setItem('crypto_glass_v51', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
-        function loadSettings() { 
-            const s = JSON.parse(localStorage.getItem('crypto_glass_v51') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI();
-            const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); 
-        }
-
-        function updateAlarmUI() { 
-            const s = document.getElementById('alarmStatus'); const d = allAlarms[currentCrypto]; 
-            s.classList.remove('trigger-active');
-            if (!d || (!d.h && !d.l)) { s.style.display = 'none'; return; } 
-            s.style.display = 'flex'; s.style.background = 'rgba(88, 166, 255, 0.1)'; s.style.color = '#8bc3ff'; s.style.border = '1px solid rgba(88, 166, 255, 0.3)';
-            s.innerHTML = `Alert Set for ${config[currentCrypto].symbol}`; 
-        }
+        function updateMuteUI() { const icon = document.getElementById('speakerIcon'); if (isMuted) { icon.innerText = 'volume_off'; icon.style.color = '#ff6b6b'; } else { icon.innerText = 'volume_up'; icon.style.color = 'rgba(255,255,255,0.4)'; } }
+        function saveSettings() { localStorage.setItem('crypto_glass_v54', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
+        function loadSettings() { const s = JSON.parse(localStorage.getItem('crypto_glass_v54') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI(); const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); }
+        function updateAlarmUI() { const s = document.getElementById('alarmStatus'); const d = allAlarms[currentCrypto]; s.classList.remove('trigger-active'); if (!d || (!d.h && !d.l)) { s.style.display = 'none'; return; } s.style.display = 'flex'; s.style.background = 'rgba(88, 166, 255, 0.1)'; s.style.color = '#8bc3ff'; s.style.border = '1px solid rgba(88, 166, 255, 0.3)'; s.innerHTML = `Alert Set for ${config[currentCrypto].symbol}`; }
 
         window.onload = () => { changeCrypto(); connect(); };
     </script>
