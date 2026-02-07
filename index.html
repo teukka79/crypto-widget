@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v54</title>
+    <title>Crypto Glass Mobile v55</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -13,7 +13,7 @@
             --midnight-blue: hsla(220, 100%, 10%, 0.8);
             --accent-green: #238636;
             --live-color: #4ade80;
-            --trigger-color: #4ade80; /* Dynaaminen hehkun väri */
+            --trigger-color: #4ade80;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -38,6 +38,20 @@
             background-attachment: fixed;
             background-size: cover;
         }
+
+        /* KELLUVA ILMOITUS (v55 uutuus) */
+        #floatingAlert {
+            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
+            width: 90%; max-width: 380px; z-index: 1000;
+            background: rgba(20, 30, 50, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px;
+            padding: 15px 20px; display: flex; align-items: center; gap: 15px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+            transition: top 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+        }
+        #floatingAlert.show { top: 20px; }
+        .fa-icon { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
         .widget {
             position: relative; width: 100%; max-width: 400px;
@@ -116,9 +130,8 @@
 
         .alarm-status { margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 14px; text-align: center; display: none; font-weight: 800; align-items: center; justify-content: center; gap: 8px; }
 
-        /* DYNAAMINEN HEHKU-ANIMAAATIO */
         @keyframes triggerPulse { 
-            0% { transform: scale(1); box-shadow: 0 0 0 0px var(--trigger-color); opacity: 1; } 
+            0% { transform: scale(1); box-shadow: 0 0 0 0px var(--trigger-color); } 
             50% { transform: scale(1.02); } 
             100% { transform: scale(1); box-shadow: 0 0 0 15px transparent; } 
         }
@@ -131,6 +144,15 @@
     </style>
 </head>
 <body>
+    <div id="floatingAlert" onclick="switchToAlertCrypto()">
+        <div class="fa-icon" id="faIcon"></div>
+        <div style="flex: 1;">
+            <div id="faTitle" style="font-weight: 800; font-size: 16px;">Target Reached!</div>
+            <div id="faSubtitle" style="font-size: 13px; color: rgba(255,255,255,0.6);">Click to view details</div>
+        </div>
+        <span class="material-symbols-outlined" style="font-size: 20px; color: rgba(255,255,255,0.3);">chevron_right</span>
+    </div>
+
     <div class="widget">
         <audio id="audioHigh" src="price_up.mp3" preload="auto"></audio>
         <audio id="audioLow" src="price_down.mp3" preload="auto"></audio>
@@ -204,6 +226,8 @@
     <script>
         let ws, currentCrypto = 'btc', currentView = '1h', lastAlarmTime = 0;
         let statsData = {}, allAlarms = {}, triggeredState = {}, isMuted = false, liveTickerData = {};
+        let lastTriggeredCrypto = null; // Tallenna mikä kolikko triggeröi viimeksi kelluvaa ilmoitusta varten
+
         const config = {
             btc: { name: 'Bitcoin', symbol: 'BTC', pair: 'btcusdt', dec: 2, img: 'https://assets.coingecko.com/coins/images/1/large/bitcoin.png' },
             sol: { name: 'Solana', symbol: 'SOL', pair: 'solusdt', dec: 2, img: 'https://assets.coingecko.com/coins/images/4128/large/solana.png' },
@@ -260,20 +284,44 @@
         }
 
         function triggerEffect(key, dir, price) {
-            if (key !== currentCrypto) return;
             const root = document.documentElement;
-            if (!isMuted && Date.now() - lastAlarmTime > 5000) { document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{}); lastAlarmTime = Date.now(); }
-            const s = document.getElementById('alarmStatus'); s.style.display = 'flex'; s.classList.add('trigger-active');
+            const isHigh = (dir === 'up');
             
-            if (dir === 'up') { 
-                root.style.setProperty('--trigger-color', 'rgba(74, 222, 128, 0.6)'); // Vihreä hehku
-                s.style.background = 'rgba(74, 222, 128, 0.2)'; s.style.border = '1px solid #4ade80'; s.style.color = '#ffffff'; 
-                s.innerHTML = `<span class="material-symbols-outlined" style="color:#4ade80; font-weight:bold;">trending_up</span> TARGET: $${price.toLocaleString()}`; 
-            } 
-            else { 
-                root.style.setProperty('--trigger-color', 'rgba(248, 81, 73, 0.6)'); // Punainen hehku
-                s.style.background = 'rgba(248, 81, 73, 0.2)'; s.style.border = '1px solid #f85149'; s.style.color = '#ffffff'; 
-                s.innerHTML = `<span class="material-symbols-outlined" style="color:#ff6b6b; font-weight:bold;">trending_down</span> TARGET: $${price.toLocaleString()}`; 
+            // Ääni kuuluu aina taustallakin
+            if (!isMuted && Date.now() - lastAlarmTime > 5000) { 
+                document.getElementById(isHigh ? 'audioHigh' : 'audioLow').play().catch(()=>{}); 
+                lastAlarmTime = Date.now(); 
+            }
+
+            if (key === currentCrypto) {
+                // NÄKYVISSÄ OLEVAN KOLIKON HÄLYTYS
+                const s = document.getElementById('alarmStatus'); s.style.display = 'flex'; s.classList.add('trigger-active');
+                root.style.setProperty('--trigger-color', isHigh ? 'rgba(74, 222, 128, 0.6)' : 'rgba(248, 81, 73, 0.6)');
+                s.style.background = isHigh ? 'rgba(74, 222, 128, 0.2)' : 'rgba(248, 81, 73, 0.2)';
+                s.style.border = isHigh ? '1px solid #4ade80' : '1px solid #f85149';
+                s.style.color = '#ffffff';
+                s.innerHTML = `<span class="material-symbols-outlined" style="color:${isHigh ? '#4ade80' : '#ff6b6b'}; font-weight:bold;">${isHigh ? 'trending_up' : 'trending_down'}</span> TARGET: $${price.toLocaleString()}`;
+            } else {
+                // TAUSTAKOLIKON KELLUVA ILMOITUS
+                lastTriggeredCrypto = key;
+                const fa = document.getElementById('floatingAlert');
+                const faIcon = document.getElementById('faIcon');
+                faIcon.style.background = isHigh ? '#238636' : '#f85149';
+                faIcon.innerHTML = `<span class="material-symbols-outlined" style="font-size:20px; color:white;">${isHigh ? 'north' : 'south'}</span>`;
+                document.getElementById('faTitle').innerText = `${config[key].symbol} Target Reached!`;
+                document.getElementById('faSubtitle').innerText = `${isHigh ? 'Above' : 'Below'} $${price.toLocaleString()}`;
+                fa.classList.add('show');
+                
+                // Piilota automaattisesti 8s päästä
+                setTimeout(() => fa.classList.remove('show'), 8000);
+            }
+        }
+
+        function switchToAlertCrypto() {
+            if (lastTriggeredCrypto) {
+                document.getElementById('cryptoSelect').value = lastTriggeredCrypto;
+                changeCrypto();
+                document.getElementById('floatingAlert').classList.remove('show');
             }
         }
 
@@ -285,8 +333,8 @@
         function updateStatsUI() { const d = statsData[currentCrypto]?.[currentView]; if (d) { document.getElementById('valHigh').innerText = d.h; document.getElementById('valLow').innerText = d.l; document.getElementById('valVol').innerText = d.v; } }
         function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
         function updateMuteUI() { const icon = document.getElementById('speakerIcon'); if (isMuted) { icon.innerText = 'volume_off'; icon.style.color = '#ff6b6b'; } else { icon.innerText = 'volume_up'; icon.style.color = 'rgba(255,255,255,0.4)'; } }
-        function saveSettings() { localStorage.setItem('crypto_glass_v54', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
-        function loadSettings() { const s = JSON.parse(localStorage.getItem('crypto_glass_v54') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI(); const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); }
+        function saveSettings() { localStorage.setItem('crypto_glass_v55', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
+        function loadSettings() { const s = JSON.parse(localStorage.getItem('crypto_glass_v55') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI(); const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); }
         function updateAlarmUI() { const s = document.getElementById('alarmStatus'); const d = allAlarms[currentCrypto]; s.classList.remove('trigger-active'); if (!d || (!d.h && !d.l)) { s.style.display = 'none'; return; } s.style.display = 'flex'; s.style.background = 'rgba(88, 166, 255, 0.1)'; s.style.color = '#8bc3ff'; s.style.border = '1px solid rgba(88, 166, 255, 0.3)'; s.innerHTML = `Alert Set for ${config[currentCrypto].symbol}`; }
 
         window.onload = () => { changeCrypto(); connect(); };
