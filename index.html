@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v60.4</title>
+    <title>Crypto Glass Mobile v60.5</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -47,29 +47,14 @@
         .title { font-size: 20px; font-weight: 700; }
         .subtitle { color: rgba(255, 255, 255, 0.5); font-size: 13px; }
 
-        /* LUKITTU PUDOTUSVALIKKO v60.4 */
         select {
-            width: 100%; 
-            height: 54px !important; 
-            min-height: 54px !important;
-            max-height: 54px !important;
-            line-height: 52px !important; /* Pystysuuntainen keskitys */
-            padding: 0 15px; 
-            background: rgba(0, 0, 0, 0.7); 
-            border: 1px solid rgba(255, 255, 255, 0.2); 
-            border-radius: 14px;
-            color: #fff; 
-            appearance: none; 
-            -webkit-appearance: none;
-            margin-bottom: 15px; 
-            font-size: 18px; 
-            font-weight: 700; 
-            outline: none;
-            display: block;
-            box-sizing: border-box;
+            width: 100%; height: 54px !important; min-height: 54px !important; max-height: 54px !important;
+            line-height: 52px !important; padding: 0 15px; 
+            background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px;
+            color: #fff; appearance: none; -webkit-appearance: none;
+            margin-bottom: 15px; font-size: 18px; font-weight: 700; outline: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='24' viewBox='0 -960 960 960' width='24' fill='white'%3E%3Cpath d='M480-345 240-585l56-56 184 184 184-184 56 56-240 240Z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat; 
-            background-position: right 15px center;
+            background-repeat: no-repeat; background-position: right 15px center;
         }
 
         .tab-btn {
@@ -88,16 +73,36 @@
         .stat-label { color: rgba(255, 255, 255, 0.4); font-size: 10px; text-transform: uppercase; margin-bottom: 4px; }
         .stat-value { font-size: 16px; font-weight: 700; }
 
+        /* ALARM SECTION & HIGHLIGHTING v60.5 */
         .alarm-section { 
             background: rgba(0, 0, 0, 0.4); border-radius: 22px; padding: 18px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto; /* Dynaaminen väli */
+            border: 1px solid rgba(255, 255, 255, 0.1); margin-top: auto;
         }
+        
         .input-group {
             position: relative; flex: 1; display: flex; align-items: center;
-            background: rgba(0, 0, 0, 0.5); border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 14px; padding-left: 12px; height: 50px;
+            transition: all 0.2s ease;
         }
-        input[type="number"] { width: 100%; height: 100%; background: transparent; border: none; padding: 0 10px; color: #fff; font-size: 18px; outline: none; }
+        
+        /* Korostus kun laatikko on valittu */
+        .input-group:focus-within {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.4);
+            transform: translateY(-1px);
+        }
+
+        input[type="number"] { 
+            width: 100%; height: 100%; background: transparent; border: none; 
+            padding: 0 10px; color: #fff; font-size: 18px; outline: none; 
+        }
+
+        /* Himmeämpi placeholder teksti */
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.15) !important;
+            font-weight: 400;
+        }
 
         .action { flex: 1; height: 50px; border: none; border-radius: 14px; font-weight: 800; font-size: 17px; cursor: pointer; }
         .btn-set { background: var(--accent-green); color: white; }
@@ -174,8 +179,14 @@
                 </button>
             </div>
             <div style="display:flex; gap:10px;">
-                <div class="input-group"><span class="material-symbols-outlined" style="font-size:18px; opacity:0.3;">north</span><input type="number" id="alarmHigh" placeholder="Above" inputmode="decimal"></div>
-                <div class="input-group"><span class="material-symbols-outlined" style="font-size:18px; opacity:0.3;">south</span><input type="number" id="alarmLow" placeholder="Below" inputmode="decimal"></div>
+                <div class="input-group">
+                    <span class="material-symbols-outlined" style="font-size:18px; opacity:0.3;">north</span>
+                    <input type="number" id="alarmHigh" placeholder="Above" inputmode="decimal">
+                </div>
+                <div class="input-group">
+                    <span class="material-symbols-outlined" style="font-size:18px; opacity:0.3;">south</span>
+                    <input type="number" id="alarmLow" placeholder="Below" inputmode="decimal">
+                </div>
             </div>
             <div style="display:flex; gap:10px; margin-top:12px;">
                 <button class="action btn-set" onclick="setAlarm()">Set</button>
