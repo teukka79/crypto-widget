@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Crypto Glass Mobile v60.7</title>
+    <title>Crypto Glass Mobile v62.4 - Master Master</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
             --forest-green: hsla(150, 80%, 15%, 0.8);
             --midnight-blue: hsla(220, 100%, 10%, 0.8);
             --accent-green: #238636;
+            --accent-red: #f85149;
             --live-color: #4ade80;
-            --trigger-color: #4ade80;
         }
 
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -32,23 +32,14 @@
             background-size: cover;
         }
 
-        /* WIDGET DESKTOP & MOBILE OPTIMIZATION v60.7 */
         .widget {
-            position: relative; 
-            width: 100%; 
-            max-width: 430px; /* Lukitsee leveyden desktopilla */
-            height: 100vh;
-            margin: 0 auto; /* Keskittää widgetin */
-            padding: 20px;
+            position: relative; width: 100%; max-width: 430px; height: 100vh;
+            margin: 0 auto; padding: 20px;
             padding-top: calc(env(safe-area-inset-top) + 10px);
             padding-bottom: calc(env(safe-area-inset-bottom) + 15px);
-            background: rgba(10, 15, 25, 0.4); 
-            backdrop-filter: blur(40px); 
-            -webkit-backdrop-filter: blur(40px);
-            display: flex; 
-            flex-direction: column;
-            border-left: 1px solid rgba(255, 255, 255, 0.05);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(10, 15, 25, 0.4); backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+            display: flex; flex-direction: column;
+            border-left: 1px solid rgba(255, 255, 255, 0.05); border-right: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 0 50px rgba(0,0,0,0.5);
         }
 
@@ -59,8 +50,7 @@
         .subtitle { color: rgba(255, 255, 255, 0.5); font-size: 13px; }
 
         select {
-            width: 100%; height: 54px !important; min-height: 54px !important; max-height: 54px !important;
-            line-height: 52px !important; padding: 0 15px; 
+            width: 100%; height: 54px; padding: 0 15px; 
             background: rgba(0, 0, 0, 0.7); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 14px;
             color: #fff; appearance: none; -webkit-appearance: none;
             margin-bottom: 15px; font-size: 18px; font-weight: 700; outline: none;
@@ -86,43 +76,59 @@
 
         .alarm-section { 
             background: rgba(0, 0, 0, 0.4); border-radius: 22px; padding: 18px; 
-            border: 1px solid rgba(255, 255, 255, 0.1); margin-top: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .input-group {
             position: relative; flex: 1; display: flex; align-items: center;
             background: rgba(0, 0, 0, 0.4); border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px; padding-left: 12px; height: 50px; transition: all 0.2s ease;
+            border-radius: 14px; padding-left: 12px; height: 50px;
         }
         
-        .input-group:focus-within { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.4); }
         input[type="number"] { width: 100%; height: 100%; background: transparent; border: none; padding: 0 10px; color: #fff; font-size: 18px; outline: none; }
-        input::placeholder { color: rgba(255, 255, 255, 0.15) !important; }
+        input::placeholder { color: rgba(255, 255, 255, 0.15); }
 
         .action { flex: 1; height: 50px; border: none; border-radius: 14px; font-weight: 800; font-size: 17px; cursor: pointer; }
         .btn-set { background: var(--accent-green); color: white; }
         .btn-clear { background: rgba(248, 81, 73, 0.1); color: #ff7b7b; border: 1px solid rgba(248, 81, 73, 0.2); }
 
-        .alarm-status { margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 800; display: none; align-items: center; justify-content: center; gap: 8px; }
-        .footer { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; color: rgba(255, 255, 255, 0.25); font-size: 12px; }
-        
+        /* ULTRA TRANSPARENT GLASS POPUP STYLE v62.4 */
         #floatingAlert {
-            position: fixed; top: -100px; left: 50%; transform: translateX(-50%);
-            width: calc(100% - 30px); max-width: 400px; z-index: 2000;
-            background: rgba(30, 40, 60, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 18px;
-            padding: 15px; display: flex; align-items: center; gap: 12px;
-            box-shadow: 0 15px 30px rgba(0,0,0,0.5); transition: top 0.4s ease;
+            position: fixed; top: -160px; left: 50%; transform: translateX(-50%);
+            width: calc(100% - 30px); max-width: 410px; z-index: 2000;
+            border-radius: 24px; padding: 22px; 
+            display: flex; align-items: center; gap: 18px;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.7);
+            transition: all 0.6s cubic-bezier(0.19, 1, 0.22, 1);
+            overflow: hidden;
         }
-        #floatingAlert.show { top: 15px; }
+        #floatingAlert.show { top: 20px; }
+
+        #faIconContainer {
+            width: 48px; height: 48px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(255, 255, 255, 0.1); z-index: 2;
+        }
+        #faTextContent { position: relative; z-index: 2; flex: 1; }
+
+        .footer { display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 20px; color: rgba(255, 255, 255, 0.25); font-size: 12px; }
+
+        @keyframes pulse-icon {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.15); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        .pulse { animation: pulse-icon 2s infinite ease-in-out; }
     </style>
 </head>
 <body>
     <div id="floatingAlert" onclick="switchToAlertCrypto()">
-        <div id="faIcon" style="width:36px; height:36px; border-radius:50%; display:flex; align-items:center; justify-content:center;"></div>
-        <div style="flex: 1;">
-            <div id="faTitle" style="font-weight: 800; font-size: 16px; color:#fff;">Target!</div>
-            <div id="faSubtitle" style="font-size: 13px; color: rgba(255,255,255,0.7);">Click to view</div>
+        <div id="faIconContainer">
+            <span id="faIcon" class="material-symbols-outlined pulse" style="font-size: 32px;"></span>
+        </div>
+        <div id="faTextContent">
+            <div id="faTitle" style="font-weight: 900; font-size: 19px; color:#fff; letter-spacing: -0.5px; margin-bottom: 2px;">Target!</div>
+            <div id="faSubtitle" style="font-size: 14px; color: rgba(255,255,255,0.85);">Click to view</div>
         </div>
     </div>
 
@@ -181,7 +187,7 @@
                 <button class="action btn-set" onclick="setAlarm()">Set</button>
                 <button class="action btn-clear" onclick="clearAlarm()">Clear</button>
             </div>
-            <div class="alarm-status" id="alarmStatus"></div>
+            <div class="alarm-status" id="alarmStatus" style="margin-top: 15px; padding: 12px; border-radius: 12px; font-size: 15px; font-weight: 800; display: none; align-items: center; justify-content: center;"></div>
         </div>
 
         <div class="footer">
@@ -243,13 +249,30 @@
                 document.getElementById(dir === 'up' ? 'audioHigh' : 'audioLow').play().catch(()=>{}); 
                 lastAlarmTime = Date.now(); 
             }
-            if (key !== currentCrypto) {
-                lastTriggeredCrypto = key;
-                const fa = document.getElementById('floatingAlert');
-                document.getElementById('faIcon').style.background = dir === 'up' ? '#238636' : '#f85149';
-                document.getElementById('faTitle').innerText = `${config[key].symbol} ${dir.toUpperCase()}`;
-                fa.classList.add('show'); setTimeout(() => fa.classList.remove('show'), 6000);
-            }
+            lastTriggeredCrypto = key;
+            const fa = document.getElementById('floatingAlert');
+            const faIcon = document.getElementById('faIcon');
+            const isUp = dir === 'up';
+            
+            // ULTRA GLASS (v62.4) [cite: 2026-02-07]
+            const glassColor = isUp ? 'rgba(20, 160, 90, 0.2)' : 'rgba(180, 40, 40, 0.2)';
+            const borderColor = isUp ? 'rgba(74, 222, 128, 0.4)' : 'rgba(255, 82, 82, 0.4)';
+            const iconColor = isUp ? '#4ade80' : '#ff5252';
+
+            fa.style.background = glassColor;
+            fa.style.backdropFilter = "blur(40px) saturate(180%)";
+            fa.style.webkitBackdropFilter = "blur(40px) saturate(180%)";
+            fa.style.border = `1px solid ${borderColor}`;
+            
+            faIcon.innerText = isUp ? 'trending_up' : 'trending_down';
+            faIcon.style.color = iconColor;
+            faIcon.style.textShadow = isUp ? '0 0 15px rgba(74, 222, 128, 0.6)' : '0 0 15px rgba(255, 82, 82, 0.6)';
+            
+            document.getElementById('faTitle').innerText = `${config[key].symbol} ${isUp ? 'SURGING' : 'DROPPING'}`;
+            document.getElementById('faSubtitle').innerText = `Limit $${price.toLocaleString()} hit!`;
+            
+            fa.classList.add('show'); 
+            setTimeout(() => { fa.classList.remove('show'); }, 6000);
         }
 
         function changeCrypto() { currentCrypto = document.getElementById('cryptoSelect').value; const c = config[currentCrypto]; document.getElementById('cryptoName').innerText = c.name; document.getElementById('cryptoPair').innerText = c.symbol+'/USDT'; document.getElementById('cryptoIconImg').src = c.img; loadSettings(); updateStatsUI(); updateUIPrice(); }
@@ -260,8 +283,22 @@
         function toggleMute() { isMuted = !isMuted; updateMuteUI(); saveSettings(); }
         function updateMuteUI() { const i = document.getElementById('speakerIcon'); i.innerText = isMuted ? 'volume_off' : 'volume_up'; i.style.color = isMuted ? '#ff6b6b' : 'rgba(255,255,255,0.4)'; }
         function updateMemory(k, p, h, l, v) { if (!statsData[k]) statsData[k] = {}; statsData[k][p] = { h: '$'+parseFloat(h).toLocaleString(), l: '$'+parseFloat(l).toLocaleString(), v: '$'+parseFloat(v).toLocaleString(undefined,{maximumFractionDigits:0}) }; }
-        function saveSettings() { localStorage.setItem('crypto_glass_v60', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); }
-        function loadSettings() { const s = JSON.parse(localStorage.getItem('crypto_glass_v60') || '{}'); allAlarms = s.alarms || {}; isMuted = s.muted || false; updateMuteUI(); const d = allAlarms[currentCrypto] || {}; document.getElementById('alarmHigh').value = d.h || ''; document.getElementById('alarmLow').value = d.l || ''; updateAlarmUI(); }
+        
+        function saveSettings() { 
+            localStorage.setItem('crypto_glass_v54', JSON.stringify({ last: currentCrypto, alarms: allAlarms, muted: isMuted })); 
+        }
+
+        function loadSettings() { 
+            const s = JSON.parse(localStorage.getItem('crypto_glass_v54') || '{}'); 
+            allAlarms = s.alarms || {}; 
+            isMuted = s.muted || false; 
+            updateMuteUI(); 
+            const d = allAlarms[currentCrypto] || {}; 
+            document.getElementById('alarmHigh').value = d.h || ''; 
+            document.getElementById('alarmLow').value = d.l || ''; 
+            updateAlarmUI(); 
+        }
+
         function updateAlarmUI() { const s = document.getElementById('alarmStatus'); const d = allAlarms[currentCrypto]; if (!d || (!d.h && !d.l)) { s.style.display = 'none'; return; } s.style.display = 'flex'; s.style.background = 'rgba(88, 166, 255, 0.1)'; s.style.border = '1px solid rgba(88, 166, 255, 0.3)'; s.innerHTML = `ALERTS ACTIVE`; }
         function switchToAlertCrypto() { if (lastTriggeredCrypto) { document.getElementById('cryptoSelect').value = lastTriggeredCrypto; changeCrypto(); document.getElementById('floatingAlert').classList.remove('show'); } }
 
