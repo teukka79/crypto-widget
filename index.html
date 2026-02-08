@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Crypto Glass v55.9.3 - Active Bell Edition</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div id="floatingAlert" onclick="dismissAlert()">
+        <div id="faIconContainer">
+            <span id="faIcon" class="material-symbols-outlined"></span>
+        </div>
+        <div id="faContent">
+            <div class="reveal-box">
+                <div id="faTitle">...</div>
+            </div>
+            <div class="reveal-box">
+                <div id="faSubtitle">...</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalOverlay">
+        <div id="modalContainer"></div>
+    </div>
+
+    <div class="widget">
+        <div class="header">
+            <div class="crypto-icon"><img id="cryptoIconImg" src=""></div>
+            <div>
+                <div id="cryptoName">BTC</div>
+                <div id="cryptoPair">BTC/USDT</div>
+            </div>
+        </div>
+
+        <div class="select-row">
+            <select id="cryptoSelect" onchange="handleSelectChange()"></select>
+            <button class="glass-btn-icon" style="color:var(--static-green-text);" onclick="openAddModal()">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+            <button class="glass-btn-icon" style="color:var(--static-red-text);" onclick="confirmRemove()">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        </div>
+
+        <div class="tf-selector">
+            <button id="tf1h" class="tf-btn" onclick="setTimeframe('1h')">1H</button>
+            <button id="tf24h" class="tf-btn active" onclick="setTimeframe('24h')">24H</button>
+        </div>
+
+        <div class="price-display">
+            <div class="price" id="price">$0.00</div>
+            <div id="priceChangeContainer"><span id="priceChange">+0.00%</span></div>
+        </div>
+
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-label">HIGH</div>
+                <div id="valHigh" class="stat-value">--</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">LOW</div>
+                <div id="valLow" class="stat-value">--</div>
+            </div>
+            <div class="stat" style="grid-column: span 2;">
+                <div id="volLabel" class="stat-label">24H VOLUME</div>
+                <div id="valVol" class="stat-value">--</div>
+            </div>
+        </div>
+
+        <div class="alarm-section">
+            <div class="alarm-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div class="glass-btn-icon" style="width:40px; height:40px;">
+                        <span class="material-symbols-outlined" id="widgetBell">notifications</span>
+                    </div>
+                    <span style="font-weight:800; font-size:16px;">ALERTS</span>
+                </div>
+                <button id="muteBtn" class="glass-btn-icon" onclick="toggleMute()" style="width:40px; height:40px;">
+                    <span class="material-symbols-outlined" id="muteIcon">volume_up</span>
+                </button>
+            </div>
+            <div class="alarm-grid">
+                <input type="number" id="alarmHigh" placeholder="ABOVE" step="any">
+                <input type="number" id="alarmLow" placeholder="BELOW" step="any">
+                <button class="btn-static static-green" onclick="setAlarm()">SET</button>
+                <button class="btn-static static-red" onclick="clearAlarm()">CLEAR</button>
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="live-status-bar">
+                <div style="position:relative; width:8px; height:8px;">
+                    <div class="pulse-dot"></div>
+                    <div class="pulse-ring"></div>
+                </div>
+                <div id="liveClock" style="font-weight:800; font-size:14px;">00:00:00</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
