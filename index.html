@@ -178,15 +178,34 @@
             mi.innerText = isMuted ? 'volume_off' : 'volume_up';
         }
 
+        // KUVAKEJÄRJESTYS: 1. Gate.io, 2. CoinGecko, 3. Binance (Proxy), 4. Fallback
         function changeCrypto() {
             const coin = config[currentCrypto];
             const sym = coin.symbol.toUpperCase();
             const iconImg = document.getElementById('cryptoIconImg');
-            let iconUrl = (coin.source === 'gate' || sym === 'REEF') 
-                ? `https://www.gate.io/images/coin_icon/64/${sym.toLowerCase()}.png`
-                : `https://bin.bnbstatic.com/static/assets/logos/${sym}.png`;
-            iconImg.src = iconUrl + "?t=" + Date.now();
-            iconImg.onerror = function() { this.src = `https://ui-avatars.com/api/?name=${sym}&background=000033&color=4ade80&bold=true`; this.onerror = null; };
+            
+            // 1. ENSISIJOINEN: Gate.io (toimii parhaiten mobiilissa ilman proxyja)
+            let iconUrl = `https://www.gate.io/images/coin_icon/64/${sym.toLowerCase()}.png`;
+            iconImg.src = iconUrl;
+
+            iconImg.onerror = function() {
+                // 2. TOINEN: CoinGecko
+                console.log("Gate.io kuva ei löytynyt, kokeillaan CoinGeckoa...");
+                this.src = `https://assets.coingecko.com/coins/images/279/large/${sym.toLowerCase()}.png`;
+                
+                this.onerror = function() {
+                    // 3. KOLMAS: Binance (Proxyn kautta)
+                    console.log("CoinGecko ei löytynyt, kokeillaan Binance Proxy...");
+                    this.src = `https://corsproxy.io/?https://bin.bnbstatic.com/static/assets/logos/${sym}.png`;
+                    
+                    this.onerror = function() {
+                        // 4. NELJÄS: UI-Avatar (Kirjainkuvake)
+                        this.src = `https://ui-avatars.com/api/?name=${sym}&background=000033&color=4ade80&bold=true`;
+                        this.onerror = null;
+                    };
+                };
+            };
+
             document.getElementById('cryptoName').innerText = coin.symbol;
             document.getElementById('cryptoPair').innerText = coin.symbol + '/USDT';
             document.getElementById('alarmHigh').value = (alarms[currentCrypto] || {}).high || '';
@@ -270,7 +289,11 @@
         }
 
         function setTimeframe(tf) { currentTimeframe = tf; document.getElementById('tf1h').classList.toggle('active', tf==='1h'); document.getElementById('tf24h').classList.toggle('active', tf==='24h'); updateChangeDisplay(); updateVolDisplay(); }
-        function save() { localStorage.setItem('crypto_glass_v55', JSON.stringify({ config, current: currentCrypto, alarms, isMuted })); localStorage.setItem('portfolioStatus', JSON.stringify({lastUpdate: Date.now()})); }
+        
+        function save() { 
+            localStorage.setItem('crypto_glass_v55', JSON.stringify({ config, current: currentCrypto, alarms, isMuted }));
+            localStorage.setItem('portfolioStatus', JSON.stringify({ lastUpdate: Date.now() })); 
+        }
 
         function openAddModal() {
             document.getElementById('modalOverlay').style.display = 'flex';
