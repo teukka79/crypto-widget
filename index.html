@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Crypto Glass v55.9.3 - Active Bell Edition</title>
+    <title>Crypto Glass v54 - Masterpiece Edition</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
     <style>
         :root {
@@ -23,13 +23,20 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             display: flex; flex-direction: column; align-items: center; color: #e6edf3;
-            background-image: 
-                radial-gradient(at 0% 0%, var(--midnight-blue) 0%, rgba(0,0,0,0) 70%),
-                radial-gradient(at 80% 20%, var(--forest-green) 0%, rgba(0,0,0,0) 70%),
-                radial-gradient(at 100% 100%, var(--midnight-blue) 0%, rgba(0,0,0,0) 70%),
-                radial-gradient(at 10% 90%, var(--forest-green) 0%, rgba(0,0,0,0) 70%);
-            background-attachment: fixed; background-size: cover;
+            background-color: #010409;
         }
+
+        .widget {
+            position: relative; width: 100%; max-width: 390px; height: 100vh;
+            margin: 0 auto; padding: 15px; padding-top: calc(env(safe-area-inset-top) + 20px);
+            background: radial-gradient(circle at center, var(--forest-green) 0%, var(--midnight-blue) 100%);
+            backdrop-filter: blur(40px);
+            display: flex; flex-direction: column; overflow-x: hidden;
+            border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border);
+        }
+
+        #modalOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px); display:none; align-items:center; justify-content:center; z-index:11000; }
+        #modalContainer { background:#0d1117; padding:25px; border-radius:24px; width:320px; text-align:center; border:1px solid var(--glass-border); }
 
         #floatingAlert {
             position: fixed; top: -180px; left: 50%; transform: translateX(-50%);
@@ -37,34 +44,15 @@
             border-radius: 24px; padding: 18px; display: flex; align-items: center; gap: 15px;
             transition: top 0.7s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             background: rgba(255, 255, 255, 0.12); backdrop-filter: blur(40px) saturate(180%);
-            border: none; box-shadow: none; cursor: pointer; overflow: hidden;
+            cursor: pointer; overflow: hidden;
         }
         #floatingAlert.show { top: 20px; }
-
         #faIconContainer { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.1); flex-shrink: 0; }
         #faContent { flex: 1; overflow: hidden; display: flex; flex-direction: column; gap: 2px; }
-
         .reveal-box { overflow: hidden; position: relative; width: 100%; }
-        #faTitle { 
-            font-weight: 900; font-size: 16px; color: #fff; text-transform: uppercase;
-            transform: translateX(-110%); transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-            transition-delay: 0.4s;
-        }
-        #faSubtitle { 
-            font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7);
-            transform: translateX(-110%); transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1);
-            transition-delay: 0.55s;
-        }
-        #floatingAlert.show #faTitle, 
-        #floatingAlert.show #faSubtitle { transform: translateX(0); }
-
-        .widget {
-            position: relative; width: 100%; max-width: 390px; height: 100vh;
-            margin: 0 auto; padding: 15px; padding-top: calc(env(safe-area-inset-top) + 20px);
-            background: rgba(10, 15, 25, 0.45); backdrop-filter: blur(40px);
-            display: flex; flex-direction: column; overflow-x: hidden;
-            border-left: 1px solid var(--glass-border); border-right: 1px solid var(--glass-border);
-        }
+        #faTitle { font-weight: 900; font-size: 16px; color: #fff; text-transform: uppercase; transform: translateX(-110%); transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1); transition-delay: 0.4s; }
+        #faSubtitle { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.7); transform: translateX(-110%); transition: transform 0.7s cubic-bezier(0.19, 1, 0.22, 1); transition-delay: 0.55s; }
+        #floatingAlert.show #faTitle, #floatingAlert.show #faSubtitle { transform: translateX(0); }
 
         .header { display: flex; align-items: center; gap: 12px; margin-bottom: 15px; }
         .crypto-icon { width: 42px; height: 42px; display: flex; align-items: center; justify-content: center; }
@@ -85,60 +73,41 @@
 
         .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
         .stat { background: rgba(0, 0, 0, 0.4); padding: 10px; border-radius: 14px; border: 1px solid var(--glass-border); }
+        .stat div:first-child { color:rgba(255,255,255,0.5); font-size:10px; font-weight:700; text-transform: uppercase; }
+        .stat div:last-child { font-size:13px; font-weight:800; margin-top:4px; }
 
         .alarm-section { background: rgba(0, 0, 0, 0.4); border-radius: 20px; padding: 15px; border: 1px solid var(--glass-border); margin-bottom: 15px; }
         .alarm-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         .alarm-grid input { height: 52px; border-radius: 12px; background: rgba(0,0,0,0.4); border: 1px solid var(--glass-border); color: #fff; text-align: center; font-weight: 800; width: 100%; font-size: 16px; }
 
-        .btn-static { height: 48px; border: none; border-radius: 12px; font-weight: 800; width: 100%; font-size: 16px; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-static { height: 48px; border: none; border-radius: 12px; font-weight: 800; width: 100%; font-size: 16px; text-transform: uppercase; }
         .static-green { background: rgba(34, 197, 94, 0.15); color: var(--static-green-text); }
         .static-red { background: rgba(239, 68, 68, 0.15); color: var(--static-red-text); }
 
         .glass-btn-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); border: none; }
         
         #widgetBell { color: rgba(255, 255, 255, 0.3); transition: all 0.3s ease; }
-        @keyframes bell-swing { 
-            0%, 100% { transform: rotate(0); } 
-            20% { transform: rotate(18deg); } 
-            40% { transform: rotate(-18deg); } 
-            60% { transform: rotate(10deg); }
-            80% { transform: rotate(-10deg); }
-        }
-        .swinging { 
-            animation: bell-swing 0.6s infinite ease-in-out !important; 
-            color: var(--static-green-text) !important; 
-        }
+        @keyframes bell-swing { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(18deg); } 40% { transform: rotate(-18deg); } 60% { transform: rotate(10deg); } 80% { transform: rotate(-10deg); } }
+        .swinging { animation: bell-swing 0.6s infinite ease-in-out !important; color: var(--static-green-text) !important; }
 
         .footer { display: flex; justify-content: center; margin-top: auto; padding-bottom: 30px; }
         .live-status-bar { display: flex; align-items: center; gap: 12px; background: rgba(255, 255, 255, 0.03); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(255, 255, 255, 0.05); }
-        
-        @keyframes double-pulse { 0% { transform: scale(1); opacity: 1; } 70% { transform: scale(2.8); opacity: 0; } 100% { opacity: 0; } }
         .pulse-dot { width: 8px; height: 8px; background: #4ade80; border-radius: 50%; position: relative; }
+        @keyframes double-pulse { 0% { transform: scale(1); opacity: 1; } 70% { transform: scale(2.8); opacity: 0; } 100% { opacity: 0; } }
         .pulse-ring { position: absolute; width: 100%; height: 100%; background: #4ade80; border-radius: 50%; animation: double-pulse 2s infinite ease-out; opacity: 0; top:0; left:0; }
-
-        #modalOverlay { position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(15px); display:none; align-items:center; justify-content:center; z-index:11000; }
-        #modalContainer { background:#0d1117; padding:25px; border-radius:24px; width:320px; text-align:center; border:1px solid var(--glass-border); }
     </style>
 </head>
 <body>
 
     <div id="floatingAlert" onclick="dismissAlert()">
-        <div id="faIconContainer">
-            <span id="faIcon" class="material-symbols-outlined"></span>
-        </div>
+        <div id="faIconContainer"><span id="faIcon" class="material-symbols-outlined"></span></div>
         <div id="faContent">
-            <div class="reveal-box">
-                <div id="faTitle">...</div>
-            </div>
-            <div class="reveal-box">
-                <div id="faSubtitle">...</div>
-            </div>
+            <div class="reveal-box"><div id="faTitle">...</div></div>
+            <div class="reveal-box"><div id="faSubtitle">...</div></div>
         </div>
     </div>
 
-    <div id="modalOverlay">
-        <div id="modalContainer"></div>
-    </div>
+    <div id="modalOverlay"><div id="modalContainer"></div></div>
 
     <div class="widget">
         <div class="header">
@@ -163,18 +132,16 @@
         </div>
 
         <div class="stats">
-            <div class="stat"><div style="color:rgba(255,255,255,0.5); font-size:10px; font-weight:700;">HIGH</div><div id="valHigh" style="font-size:13px; font-weight:800; margin-top:4px;">--</div></div>
-            <div class="stat"><div style="color:rgba(255,255,255,0.5); font-size:10px; font-weight:700;">LOW</div><div id="valLow" style="font-size:13px; font-weight:800; margin-top:4px;">--</div></div>
-            <div class="stat" style="grid-column: span 2;"><div id="volLabel" style="color:rgba(255,255,255,0.5); font-size:10px; font-weight:700;">24H VOLUME</div><div id="valVol" style="font-size:13px; font-weight:800; margin-top:4px;">--</div></div>
+            <div class="stat"><div>HIGH</div><div id="valHigh">--</div></div>
+            <div class="stat"><div>LOW</div><div id="valLow">--</div></div>
+            <div class="stat" style="grid-column: span 2;"><div id="volLabel">24H VOLUME</div><div id="valVol">--</div></div>
         </div>
 
         <div class="alarm-section">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                 <div style="display:flex; align-items:center; gap:10px;">
-                    <div class="glass-btn-icon" style="width:40px; height:40px;">
-                        <span class="material-symbols-outlined" id="widgetBell">notifications</span>
-                    </div>
-                    <span style="font-weight:800; font-size:16px;">ALERTS</span>
+                    <div class="glass-btn-icon" style="width:40px; height:40px;"><span class="material-symbols-outlined" id="widgetBell">notifications</span></div>
+                    <span style="font-weight:800;">ALERTS</span>
                 </div>
                 <button id="muteBtn" class="glass-btn-icon" onclick="toggleMute()" style="width:40px; height:40px;"><span class="material-symbols-outlined" id="muteIcon">volume_up</span></button>
             </div>
@@ -189,7 +156,7 @@
         <div class="footer">
             <div class="live-status-bar">
                 <div style="position:relative; width:8px; height:8px;"><div class="pulse-dot"></div><div class="pulse-ring"></div></div>
-                <div id="liveClock" style="font-weight:800; font-size:14px;">00:00:00</div>
+                <div id="liveClock">00:00:00</div>
             </div>
         </div>
     </div>
@@ -214,22 +181,17 @@
         function changeCrypto() {
             const coin = config[currentCrypto];
             const sym = coin.symbol.toUpperCase();
-            
-            // PÄIVITETTY: Suora kuvakehaku Binancesta
-            document.getElementById('cryptoIconImg').src = `https://bin.bnbstatic.com/static/assets/logos/${sym}.png`;
-            document.getElementById('cryptoIconImg').onerror = function() {
-                this.src = `https://ui-avatars.com/api/?name=${sym}&background=0a0f19&color=4ade80&bold=true`;
-            };
-
+            const iconImg = document.getElementById('cryptoIconImg');
+            let iconUrl = (coin.source === 'gate' || sym === 'REEF') 
+                ? `https://www.gate.io/images/coin_icon/64/${sym.toLowerCase()}.png`
+                : `https://bin.bnbstatic.com/static/assets/logos/${sym}.png`;
+            iconImg.src = iconUrl + "?t=" + Date.now();
+            iconImg.onerror = function() { this.src = `https://ui-avatars.com/api/?name=${sym}&background=000033&color=4ade80&bold=true`; this.onerror = null; };
             document.getElementById('cryptoName').innerText = coin.symbol;
             document.getElementById('cryptoPair').innerText = coin.symbol + '/USDT';
             document.getElementById('alarmHigh').value = (alarms[currentCrypto] || {}).high || '';
             document.getElementById('alarmLow').value = (alarms[currentCrypto] || {}).low || '';
-            connect(); fetch1hData(currentCrypto);
-            
-            const wb = document.getElementById('widgetBell');
-            wb.classList.remove('swinging');
-            wb.innerText = 'notifications';
+            connect(); fetch1hData(currentCrypto); dismissAlert(); 
         }
 
         function connect() {
@@ -253,7 +215,7 @@
             updateChangeDisplay();
             document.getElementById('valHigh').innerText = '$' + parseFloat(high).toLocaleString(undefined, {maximumFractionDigits: decimals});
             document.getElementById('valLow').innerText = '$' + parseFloat(low).toLocaleString(undefined, {maximumFractionDigits: decimals});
-            currentLiveVol = parseFloat(vol).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' USDT';
+            currentLiveVol = '$' + parseFloat(vol).toLocaleString(undefined, {maximumFractionDigits: 0});
             updateVolDisplay(); checkAlarms(p);
         }
 
@@ -264,77 +226,33 @@
             let hit = false; let direction = '';
             const decimals = (config[cKey].symbol === "REEF") ? 8 : (p < 10 ? 4 : 2);
             const fmtPrice = '$' + p.toLocaleString(undefined, {minimumFractionDigits: decimals, maximumFractionDigits: decimals});
-
             if (a.high && p >= a.high) { if (!alertStates[cKey].h) { hit = true; alertStates[cKey].h = true; direction = 'up'; } } else { alertStates[cKey].h = false; }
             if (a.low && p <= a.low) { if (!alertStates[cKey].l) { hit = true; alertStates[cKey].l = true; direction = 'down'; } } else { alertStates[cKey].l = false; }
-
-            if (hit) {
-                if (!isMuted && (now - lastAudioTime > 30000)) { audioUp.play().catch(e => {}); lastAudioTime = now; }
-                const target = direction === 'up' ? a.high : a.low;
-                showFloatingAlert(config[cKey].symbol, direction, fmtPrice, target, false);
-                const wb = document.getElementById('widgetBell');
-                wb.innerText = 'notifications_active';
-                wb.classList.add('swinging');
-            }
+            if (hit) { if (!isMuted && (now - lastAudioTime > 30000)) { audioUp.play().catch(e => {}); lastAudioTime = now; } showFloatingAlert(config[cKey].symbol, direction, fmtPrice, (direction === 'up' ? a.high : a.low), false); }
         }
 
         function showFloatingAlert(symbol, dir, price, target, isConfirmation = false) {
-            const fa = document.getElementById('floatingAlert');
-            const faIcon = document.getElementById('faIcon');
-            const faTitle = document.getElementById('faTitle');
-            const faSubtitle = document.getElementById('faSubtitle');
+            const fa = document.getElementById('floatingAlert'); const faIcon = document.getElementById('faIcon'); const faTitle = document.getElementById('faTitle'); const faSubtitle = document.getElementById('faSubtitle'); const wb = document.getElementById('widgetBell');
             fa.classList.remove('show');
             setTimeout(() => {
-                if (isConfirmation) {
-                    fa.style.background = 'rgba(255, 255, 255, 0.12)';
-                    faIcon.innerText = 'task_alt';
-                    faIcon.style.color = '#4ade80';
-                    faTitle.innerText = 'SETTING SAVED';
-                    faSubtitle.innerText = `${symbol} alerts updated.`;
-                } else {
-                    const isUp = dir === 'up';
-                    fa.style.background = isUp ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)';
-                    faIcon.innerText = isUp ? 'trending_up' : 'trending_down';
-                    faIcon.style.color = isUp ? '#4ade80' : '#ff5252';
-                    faTitle.innerText = `${symbol} TARGET HIT!`;
-                    faSubtitle.innerText = `Reached $${target}`;
-                }
+                if (isConfirmation) { fa.style.background = 'rgba(255, 255, 255, 0.12)'; faIcon.innerText = 'task_alt'; faIcon.style.color = '#4ade80'; faTitle.innerText = 'SETTING SAVED'; faSubtitle.innerText = `${symbol} alerts updated.`; } 
+                else { const isUp = dir === 'up'; fa.style.background = isUp ? 'rgba(34, 197, 94, 0.2)' : 'rgba(239, 68, 68, 0.2)'; faIcon.innerText = isUp ? 'trending_up' : 'trending_down'; faIcon.style.color = isUp ? '#4ade80' : '#ff5252'; faTitle.innerText = `${symbol} TARGET HIT!`; faSubtitle.innerText = `Reached $${target}`; wb.innerText = 'notifications_active'; wb.classList.add('swinging'); }
                 fa.classList.add('show');
             }, 100);
-            setTimeout(() => fa.classList.remove('show'), 8000);
+            setTimeout(() => { if (fa.classList.contains('show')) dismissAlert(); }, 8000);
         }
 
-        function dismissAlert() { document.getElementById('floatingAlert').classList.remove('show'); }
-
-        function setAlarm() { 
-            const sym = config[currentCrypto].symbol;
-            alarms[currentCrypto] = { high: document.getElementById('alarmHigh').value, low: document.getElementById('alarmLow').value }; 
-            alertStates[currentCrypto] = { h: false, l: false }; 
-            save(); 
-            showFloatingAlert(sym, 'up', null, null, true);
-        }
-
-        function clearAlarm() { 
-            document.getElementById('alarmHigh').value = ''; 
-            document.getElementById('alarmLow').value = ''; 
-            delete alarms[currentCrypto]; 
-            const wb = document.getElementById('widgetBell');
-            wb.classList.remove('swinging');
-            wb.innerText = 'notifications';
-            save(); 
-        }
+        function dismissAlert() { document.getElementById('floatingAlert').classList.remove('show'); const wb = document.getElementById('widgetBell'); wb.classList.remove('swinging'); wb.innerText = 'notifications'; wb.style.color = 'rgba(255, 255, 255, 0.3)'; }
+        function setAlarm() { const sym = config[currentCrypto].symbol; alarms[currentCrypto] = { high: document.getElementById('alarmHigh').value, low: document.getElementById('alarmLow').value }; alertStates[currentCrypto] = { h: false, l: false }; save(); showFloatingAlert(sym, 'up', null, null, true); }
+        function clearAlarm() { document.getElementById('alarmHigh').value = ''; document.getElementById('alarmLow').value = ''; delete alarms[currentCrypto]; dismissAlert(); save(); }
 
         async function fetch1hData(cKey) {
             const coin = config[cKey];
             try {
-                const url = (coin.source === 'binance' && coin.symbol !== "REEF") 
-                    ? `https://api.binance.com/api/v3/klines?symbol=${coin.pair.toUpperCase()}&interval=1h&limit=1`
-                    : `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${coin.symbol}_USDT&interval=1h&limit=1`;
+                const url = (coin.source === 'binance' && coin.symbol !== "REEF") ? `https://api.binance.com/api/v3/klines?symbol=${coin.pair.toUpperCase()}&interval=1h&limit=1` : `https://api.gateio.ws/api/v4/spot/candlesticks?currency_pair=${coin.symbol}_USDT&interval=1h&limit=1`;
                 const res = await fetch(url); const d = await res.json();
                 hourlyBasePrice = (coin.source === 'binance') ? parseFloat(d[0][1]) : parseFloat(d[0][5]);
-                hourlyVolume = (coin.source === 'binance') 
-                    ? (parseFloat(d[0][5]) * hourlyBasePrice).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' USDT'
-                    : parseFloat(d[0][1]).toLocaleString(undefined, {maximumFractionDigits: 0}) + ' USDT';
+                hourlyVolume = '$' + ((coin.source === 'binance') ? (parseFloat(d[0][5]) * hourlyBasePrice) : parseFloat(d[0][1])).toLocaleString(undefined, {maximumFractionDigits: 0});
                 updateVolDisplay();
             } catch(e) {}
         }
@@ -352,44 +270,22 @@
         }
 
         function setTimeframe(tf) { currentTimeframe = tf; document.getElementById('tf1h').classList.toggle('active', tf==='1h'); document.getElementById('tf24h').classList.toggle('active', tf==='24h'); updateChangeDisplay(); updateVolDisplay(); }
-        function save() { localStorage.setItem('crypto_glass_v55', JSON.stringify({ config, current: currentCrypto, alarms, isMuted })); }
+        function save() { localStorage.setItem('crypto_glass_v55', JSON.stringify({ config, current: currentCrypto, alarms, isMuted })); localStorage.setItem('portfolioStatus', JSON.stringify({lastUpdate: Date.now()})); }
 
         function openAddModal() {
             document.getElementById('modalOverlay').style.display = 'flex';
-            document.getElementById('modalContainer').innerHTML = `
-                <h3 style="margin-top:0; font-weight:900;">ADD TOKEN</h3>
-                <input type="text" id="modalInput" style="width:100%; height:54px; background:rgba(255,255,255,0.05); color:#fff; text-align:center; border:1px solid var(--glass-border); border-radius:14px; margin-bottom:20px; font-size:18px; font-weight:800; text-transform:uppercase;" placeholder="SYMBOL">
-                <div style="display:flex; gap:10px;"><button class="btn-static static-green" onclick="confirmAdd()">ADD</button><button class="btn-static static-red" onclick="closeModal()">BACK</button></div>`;
+            document.getElementById('modalContainer').innerHTML = `<h3 style="margin-top:0;">ADD TOKEN</h3><input type="text" id="modalInput" style="width:100%; height:54px; background:rgba(255,255,255,0.05); color:#fff; text-align:center; border:1px solid var(--glass-border); border-radius:14px; margin-bottom:20px; font-size:18px; font-weight:800;" placeholder="SYMBOL"><div style="display:flex; gap:10px;"><button class="btn-static static-green" style="flex:1;" onclick="confirmAdd('binance')">BINANCE</button><button class="btn-static static-green" style="flex:1;" onclick="confirmAdd('gate')">GATE.IO</button></div><button class="btn-static" style="background:#333; color:white; width:100%; margin-top:10px;" onclick="closeModal()">CLOSE</button>`;
             setTimeout(() => document.getElementById('modalInput').focus(), 100);
         }
 
-        function confirmAdd() {
-            const sym = document.getElementById('modalInput').value.toUpperCase().trim(); if(!sym) return;
-            const src = (sym === "REEF") ? 'gate' : 'binance';
-            config[sym.toLowerCase()] = { name: sym, symbol: sym, pair: (src==='binance' ? sym.toLowerCase()+'usdt' : sym.toLowerCase()+'_usdt'), source: src };
-            currentCrypto = sym.toLowerCase(); updateSelectMenu(); closeModal(); changeCrypto(); save();
-        }
-
-        function updateSelectMenu() {
-            const sel = document.getElementById('cryptoSelect'); sel.innerHTML = '';
-            Object.keys(config).sort().forEach(k => {
-                const o = document.createElement('option'); o.value = k;
-                o.text = `${config[k].symbol} (${config[k].source === 'binance' ? 'Binance' : 'Gate.io'})`;
-                if(k === currentCrypto) o.selected = true; sel.add(o);
-            });
-        }
-
-        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
-        function confirmRemove() { const name = config[currentCrypto].symbol; document.getElementById('modalOverlay').style.display = 'flex'; document.getElementById('modalContainer').innerHTML = `<h3>REMOVE ${name}?</h3><div style="display:flex; gap:10px; margin-top:20px;"><button class="btn-static static-red" onclick="executeRemove()">DELETE</button><button class="btn-static static-green" onclick="closeModal()">KEEP</button></div>`; }
+        function confirmAdd(src) { const sym = document.getElementById('modalInput').value.toUpperCase().trim(); if(!sym) return; config[sym.toLowerCase()] = { name: sym, symbol: sym, pair: (src==='binance' ? sym.toLowerCase()+'usdt' : sym.toLowerCase()+'_usdt'), source: src }; currentCrypto = sym.toLowerCase(); updateSelectMenu(); closeModal(); changeCrypto(); save(); }
+        function updateSelectMenu() { const sel = document.getElementById('cryptoSelect'); sel.innerHTML = ''; Object.keys(config).sort().forEach(k => { const o = document.createElement('option'); o.value = k; o.text = `${config[k].symbol} (${config[k].source === 'binance' ? 'Binance' : 'Gate.io'})`; if(k === currentCrypto) o.selected = true; sel.add(o); }); }
+        function confirmRemove() { const name = config[currentCrypto].symbol; document.getElementById('modalOverlay').style.display = 'flex'; document.getElementById('modalContainer').innerHTML = `<h3>REMOVE ${name}?</h3><div style=\"display:flex; gap:10px; margin-top:20px;\"><button class=\"btn-static static-red\" style=\"flex:1;\" onclick=\"executeRemove()\">DELETE</button><button class=\"btn-static\" style=\"background:#333; color:white; flex:1;\" onclick=\"closeModal()\">CANCEL</button></div>`; }
         function executeRemove() { delete config[currentCrypto]; const rem = Object.keys(config); currentCrypto = rem.length > 0 ? rem[0] : 'btc'; save(); location.reload(); }
+        function closeModal() { document.getElementById('modalOverlay').style.display = 'none'; }
 
         setInterval(() => { document.getElementById('liveClock').innerText = new Date().toLocaleTimeString('fi-FI', { hour12: false }); }, 1000);
-
-        window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('crypto_glass_v55'));
-            if (saved) { config = saved.config || config; currentCrypto = saved.current || 'btc'; alarms = saved.alarms || {}; isMuted = saved.isMuted || false; }
-            updateSelectMenu(); changeCrypto(); updateMuteUI();
-        };
+        window.onload = () => { const saved = JSON.parse(localStorage.getItem('crypto_glass_v55')); if (saved) { config = saved.config || config; currentCrypto = saved.current || 'btc'; alarms = saved.alarms || {}; isMuted = saved.isMuted || false; } updateSelectMenu(); changeCrypto(); updateMuteUI(); };
     </script>
 </body>
 </html>
